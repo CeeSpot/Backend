@@ -3,21 +3,27 @@ The backend for the CeeSpot webapp
 
 # Getting Started
 
-Coming soon
-
 ### Prerequisites
 
-You must have NodeJS installed the run this project
+- NodeJS
+- npm
+- MySQL server
 
 ### Installing
 
-A step by step series of examples that tell you how to get a development env running
+Pull or download the repository and run npm install to install the project. After installing you can run the server by executing "npm start".
 
-Say what the step will be
+You can change the SQL-database settings in /server.js. You will find the following code there :
+```
+con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "root",
+  database: "the_cee_database"
+});
+```
 
-```
-Give the example
-```
+You can edit the settings to match your SQL-server.
 
 ## Running the tests
 
@@ -37,10 +43,9 @@ Not available
 
 ## Built With
 
-* [Vue 2](https://vuejs.org/) - Javascript framework
-* [Bootstrap-vue](https://bootstrap-vue.js.org/) - Styling framework
-* [Jest](https://jestjs.io/) - For testing
-* [FontAwesome 5](https://fontawesome.com/) - For the icons
+* [NodeJS](https://nodejs.org/) - Javascript framework
+* [Express](https://expressjs.com/) - Minimalist web framework for NodeJS
+* [mysqljs/mysql](https://github.com/mysqljs/mysql) - MySQL driver for NodeJS
 
 ## Contributing
 
