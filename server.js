@@ -7,7 +7,7 @@ mysql = require('mysql');
 con = mysql.createConnection({
   host: "localhost",
   user: "root",
-  password: "root",
+  password: "",
   database: "the_cee_database"
 });
 
