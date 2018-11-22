@@ -1,8 +1,10 @@
-var express = require('express'),
-app = express(),
-port = process.env.PORT || 3000;
-bodyParser = require('body-parser');
-mysql = require('mysql');
+var express = require('express');
+var cors = require('cors');
+var app = express();
+var port = process.env.PORT || 3000;
+var bodyParser = require('body-parser');
+var mysql = require('mysql');
+app.use(cors());
 
 con = mysql.createConnection({
   host: "localhost",
