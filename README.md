@@ -21,7 +21,7 @@ Install the node modules
 npm install
 ```
 
-You can change the SQL-database settings in /server.js. You will find the following code there :
+You can change the SQL-database settings in `/api/config.js`. You will find the following code there :
 ```
 con = mysql.createConnection({
   host: "localhost",
