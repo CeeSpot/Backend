@@ -2,7 +2,7 @@
  * Created by thama on 22-11-2018.
  */
 var jwt = require('jsonwebtoken');
-var config = require('../config');
+var config = require('./config');
 
 function verifyToken(req, res, next) {
     var token = req.headers['x-access-token'];
@@ -12,7 +12,7 @@ function verifyToken(req, res, next) {
         if (err)
             return res.status(500).send({auth: false, message: 'Failed to authenticate token.'});
         // if everything good, save to request for use in other routes
-        req.username = decoded.username;
+        req.user = decoded;
         next();
     });
 }

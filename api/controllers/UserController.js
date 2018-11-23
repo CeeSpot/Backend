@@ -25,6 +25,13 @@ exports.authenticate = function (req, res) {
        res.send(err);
     });
 };
+exports.profile = function (req, res) {
+    userModel.profile(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
 exports.me = function (req,res) {
     userModel.me(req).then(function (data) {
         res.send(data);
