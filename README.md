@@ -11,7 +11,15 @@ The backend for the CeeSpot webapp
 
 ### Installing
 
-Pull or download the repository and run npm install to install the project. After installing you can run the server by executing "npm start".
+Pull the repository into a folder of your liking
+```
+git clone https://github.com/CeeSpot/Backend.git
+```
+
+Install the node modules
+```
+npm install
+```
 
 You can change the SQL-database settings in /server.js. You will find the following code there :
 ```
@@ -22,8 +30,12 @@ con = mysql.createConnection({
   database: "the_cee_database"
 });
 ```
-
 You can edit the settings to match your SQL-server.
+
+To start the server run
+```
+npm start
+```
 
 ## Running the tests
 
@@ -46,6 +58,7 @@ Not available
 * [NodeJS](https://nodejs.org/) - Javascript framework
 * [Express](https://expressjs.com/) - Minimalist web framework for NodeJS
 * [mysqljs/mysql](https://github.com/mysqljs/mysql) - MySQL driver for NodeJS
+* [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken) - JWT for authentication in NodeJS
 
 ## Contributing
 
