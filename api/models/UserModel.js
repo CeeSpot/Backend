@@ -23,7 +23,7 @@ module.exports = {
                     reject(err) // Something went wrong
                 }
                 if (results.length > 0) {
-                    reject("Email already exists"); // User exists
+                    reject("Username already exists"); // User exists
                 } else {
                     bcrypt.genSalt(10, function (err, salt) {
                         bcrypt.hash(req.body.password, salt, function (err, hash) {
@@ -43,15 +43,44 @@ module.exports = {
                                     zipcode: req.body.zipcode,
                                     city: req.body.city,
                                     country: req.body.country,
-                                    company_id: req.body.company_id
+                                    active: 0
                                 };
 
                                 // Insert the new user
                                 con.query('INSERT INTO users SET ?', post, function (err, res) {
                                     if (err) {
+                                        console.log(err);
                                         reject({success: false, message: "Failed to insert user"});
                                     } else {
-                                        resolve({success: true, message: "Successfully made a new user"});
+                                        var user_id = res.insertId;
+                                        var user_user_role_insert = {
+                                            user_id : user_id,
+                                            user_role_id: 1000
+                                        };
+                                        var company_id = req.body.company_id;
+                                        console.log("company id: " + company_id);
+
+                                        con.query('INSERT INTO user_user_roles SET ?', user_user_role_insert, function (err,res) {
+                                           if(err){
+                                               reject({success:false, message: "Failed to assign a user to a user role"});
+                                           }else{
+                                               if(typeof company_id !== 'undefined' && company_id !== null && company_id > -1){
+                                                   var user_company_insert = {
+                                                        user_id: user_id,
+                                                        company_id: parseInt(company_id)
+                                                   };
+                                                   con.query('INSERT INTO user_companies SET ?', user_company_insert, function (err,res) {
+                                                        if(err){
+                                                            reject({success: false, message: "Failed to assign you to a company"});
+                                                        }else{
+                                                            resolve({success: true, message: "Successfully created your account"});
+                                                        }
+                                                   })
+                                               }else{
+                                                   resolve({success:true, message: "Successfully created your account"});
+                                               }
+                                           }
+                                        });
                                     }
                                 });
                             }

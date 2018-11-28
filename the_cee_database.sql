@@ -10,6 +10,7 @@
 CREATE DATABASE the_cee_database;
 USE the_cee_database;
 
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
 START TRANSACTION;
@@ -22,8 +23,27 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `the_cee_database`
+-- Database: `sql7267229`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `companies`
+--
+
+CREATE TABLE `companies` (
+  `id` int(11) NOT NULL,
+  `name` varchar(250) NOT NULL,
+  `description` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Gegevens worden geëxporteerd voor tabel `companies`
+--
+
+INSERT INTO `companies` (`id`, `name`, `description`) VALUES
+  (1, 'The CeeSpot', 'A community like no other located in Enschede');
 
 -- --------------------------------------------------------
 
@@ -44,16 +64,38 @@ CREATE TABLE `users` (
   `zipcode` varchar(20) NOT NULL,
   `city` varchar(255) NOT NULL,
   `country` varchar(125) NOT NULL,
-  `company_id` int(11) NOT NULL,
-  `user_role` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `active` int(1) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
 -- Gegevens worden geëxporteerd voor tabel `users`
 --
 
-INSERT INTO `users` (`id`, `email`, `username`, `password`, `prefix`, `first_name`, `insertions`, `last_name`, `address`, `zipcode`, `city`, `country`, `company_id`, `user_role`) VALUES
-(3, 'password@pass.com', 'waro', '$2a$10$dm0AITBu/P6eGl6ncTm0hukMbgIHfGZ495dep6zYdQYCn2b73VFc2', 'Dhr', 'Stijn', NULL, 'Klarenbeek', 'Merelstraat 75', '7471 GB', 'Goor', 'The Netherlands', 0, NULL);
+INSERT INTO `users` (`id`, `email`, `username`, `password`, `prefix`, `first_name`, `insertions`, `last_name`, `address`, `zipcode`, `city`, `country`, `active`) VALUES
+  (2, 'password@pass.com', 'waro', '$2a$10$PQcm1jXJ/I51nvadw7H8Y.yfp/TEYFtE8ouoZsIdDFZ1jzJe68fr6', 'Dhr', 'Albert', NULL, 'Einstein', 'Quicksilverstreet 15', '1238 AB', 'Goor', 'The Netherlands', 0),
+  (3, '123password@pass.com', 'waro123', '$2a$10$m6RxhGxk4696pV3/aw6A1u7H8t9UXKPSTwjhDkT3im.GcVp56dm1K', 'Dhr', 'Albert', NULL, 'Einstein', 'Quicksilverstreet 15', '1238 AB', 'Goor', 'The Netherlands', 0),
+  (4, '123password@pass.com', 'waro1234', '$2a$10$zwOP9LwntTLZCJbunuYmNOGOMwMPjFtWyeuQDAvLJ4DLxnI.lrHzi', 'Dhr', 'Albert', NULL, 'Einstein', 'Quicksilverstreet 15', '1238 AB', 'Goor', 'The Netherlands', 0),
+  (5, '123password@pass.com', 'waro12345', '$2a$10$BOCdAvC1k7m.mGRXMjySh.NJ6Vajupxtia3CSVSEiOw0PCFGGjhGK', 'Dhr', 'Albert', NULL, 'Einstein', 'Quicksilverstreet 15', '1238 AB', 'Goor', 'The Netherlands', 0),
+  (6, '123password@pass.com', 'waro123456', '$2a$10$CdKgKBB8/Y8n72dLkeEyFe5oDf.BXpqXnvpcNwR6W2DKll87RvwVO', 'Dhr', 'Albert', NULL, 'Einstein', 'Quicksilverstreet 15', '1238 AB', 'Goor', 'The Netherlands', 0),
+  (7, '123password@pass.com', 'waro1234567', '$2a$10$nmLBln74F45T1psqhK6R/enpPuP1p39UFSUpp/LsA/be5rK/ZcZrO', 'Dhr', 'Albert', NULL, 'Einstein', 'Quicksilverstreet 15', '1238 AB', 'Goor', 'The Netherlands', 0);
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `user_companies`
+--
+
+CREATE TABLE `user_companies` (
+  `user_id` int(11) NOT NULL,
+  `company_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Gegevens worden geëxporteerd voor tabel `user_companies`
+--
+
+INSERT INTO `user_companies` (`user_id`, `company_id`) VALUES
+  (6, 0);
 
 -- --------------------------------------------------------
 
@@ -67,20 +109,53 @@ CREATE TABLE `user_roles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --
+-- Gegevens worden geëxporteerd voor tabel `user_roles`
+--
+
+INSERT INTO `user_roles` (`id`, `name`) VALUES
+  (1000, 'guest user'),
+  (2000, 'fellow'),
+  (3000, 'partner'),
+  (4000, 'standard user'),
+  (5000, 'admin');
+
+-- --------------------------------------------------------
+
+--
+-- Tabelstructuur voor tabel `user_user_roles`
+--
+
+CREATE TABLE `user_user_roles` (
+  `user_id` int(11) NOT NULL,
+  `user_role_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+--
+-- Gegevens worden geëxporteerd voor tabel `user_user_roles`
+--
+
+INSERT INTO `user_user_roles` (`user_id`, `user_role_id`) VALUES
+  (2, 1000),
+  (3, 1000),
+  (4, 1000),
+  (5, 1000),
+  (6, 1000),
+  (7, 1000);
+
+--
 -- Indexen voor geëxporteerde tabellen
 --
+
+--
+-- Indexen voor tabel `companies`
+--
+ALTER TABLE `companies`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexen voor tabel `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_roles_bpes` (`user_role`);
-
---
--- Indexen voor tabel `user_roles`
---
-ALTER TABLE `user_roles`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -88,27 +163,15 @@ ALTER TABLE `user_roles`
 --
 
 --
+-- AUTO_INCREMENT voor een tabel `companies`
+--
+ALTER TABLE `companies`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+--
 -- AUTO_INCREMENT voor een tabel `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT voor een tabel `user_roles`
---
-ALTER TABLE `user_roles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- Beperkingen voor geëxporteerde tabellen
---
-
---
--- Beperkingen voor tabel `users`
---
-ALTER TABLE `users`
-  ADD CONSTRAINT `user_roles_bpes` FOREIGN KEY (`user_role`) REFERENCES `user_roles` (`id`);
-COMMIT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
