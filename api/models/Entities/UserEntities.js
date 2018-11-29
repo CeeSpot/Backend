@@ -2,7 +2,7 @@
  * Created by thama on 23-11-2018.
  */
 var bcrypt = require('bcryptjs');
-
+let entities = require('./Entities');
 /**
  * Gets a user by username
  * @param username
@@ -16,7 +16,7 @@ function getUserByUsername(username) {
             if (results.length === 0) {
                 resolve({userFound: false, message: "No users found with this username"});
             } else {
-                var user = getUserFromDatabaseUser(results[0]);
+                var user =entities.getJsonObjectFromDatabaseObject(results[0]);
                 resolve({
                     userFound: true,
                     user: user
@@ -46,25 +46,8 @@ function comparePassword(candidatePassword, hash) {
         });
     });
 }
-/**
- * Create a json object from a database user and exlucde colums in the exluded object
- *
- * @param user database user
- * @param excluded list with excluded colums
- * @returns {{user json object}}
- */
-function getUserFromDatabaseUser(user, excluded) {
-    var userObj = {};
-    for (var property in user) {
-        if (user.hasOwnProperty(property) && (typeof excluded === 'undefined' || !excluded[property])) {
-            userObj[property] = user[property];
-        }
-    }
-    return userObj;
-}
 
 module.exports = {
     'getUserByUsername': getUserByUsername,
     'comparePassword': comparePassword,
-    'getUserFromDatabaseUser': getUserFromDatabaseUser
 };

@@ -1,8 +1,9 @@
 'use strict';
-var bcrypt = require('bcryptjs');
-var jwt = require('jsonwebtoken');
-var config = require('../config');
-var userEntities = require('./Entities/User');
+let bcrypt = require('bcryptjs');
+let jwt = require('jsonwebtoken');
+let config = require('../config');
+let userEntities = require('./Entities/UserEntities');
+let entities = require('./Entities/Entities');
 
 
 module.exports = {
@@ -100,7 +101,7 @@ module.exports = {
                         if (!passwordData.isMatch) {
                             reject({success: false, message: passwordData.message.toString()});
                         } else {
-                            var user = userEntities.getUserFromDatabaseUser(data.user, {password: true});
+                            var user = entities.getJsonObjectFromDatabaseObject(data.user, {password: true});
                             var token = jwt.sign(user, config.secret, {expiresIn: 86400});
                             resolve(token);
                         }
@@ -113,18 +114,38 @@ module.exports = {
             });
         });
     },
+
+    /**
+     * Gets a user's profile
+     * @param req request given to get the userid from the request
+     * @returns {Promise}
+     */
     profile: function (req) {
         return new Promise(function (resolve, reject) {
-            var userid = req.param("userId");
+            let userid = req.param("userId");
             con.query("SELECT * FROM users WHERE id = ?", [userid], function (err, results) {
-                if (err) reject({success: false, message: err.toString()});
+                if (err) reject({success: false, message: err.toString()}); // return the error ? (up for debate)
                 if (results.length === 0) {
                     reject({success: false, message: "No users found"});
                 } else {
-                    var user = results[0];
-                    resolve({
-                        success: true,
-                        user: userEntities.getUserFromDatabaseUser(user, {password: true})
+                    let user = entities.getJsonObjectFromDatabaseObject(results[0], {password: true});
+                    con.query(`SELECT companies.id, companies.name, companies.description 
+                               FROM user_companies 
+                               INNER JOIN companies ON user_companies.company_id = companies.id 
+                               WHERE user_companies.user_id = ?`, userid, function (err, res) {
+                        if(err) reject({success: false, message: err.toString()});
+                        if(res.length > 0){
+                            // Might have more than one company associated, thus return all of them
+                            user.companies = [];
+                            res.forEach(function (i) {
+                                user.companies.push(entities.getJsonObjectFromDatabaseObject(i));
+                            });
+                            console.log(user);
+                        }
+                        resolve({
+                            success:true,
+                            user:user
+                        });
                     });
                 }
             });
@@ -132,7 +153,23 @@ module.exports = {
     },
     me: function (req) {
         return new Promise(function (resolve, reject) {
-            resolve(req.user);
+            con.query(`SELECT companies.id, companies.name, companies.description 
+                               FROM user_companies 
+                               INNER JOIN companies ON user_companies.company_id = companies.id 
+                               WHERE user_companies.user_id = ?`, req.user.id, function (err, res) {
+                if(err) reject({success: false, message: err.toString()});
+                if(res.length > 0){
+                    // Might have more than one company associated, thus return all of them
+                    req.user.companies = [];
+                    res.forEach(function (i) {
+                        req.user.companies.push(entities.getJsonObjectFromDatabaseObject(i));
+                    });
+                }
+                resolve({
+                    success:true,
+                    user:req.user
+                });
+            });
         });
     }
 };
