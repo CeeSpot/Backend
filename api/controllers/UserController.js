@@ -3,8 +3,24 @@
 var userModel = require('../models/UserModel');
 
 exports.getUsers = function (req, res) {
+        // Get All users
         userModel.getUsers.then(function (data) {
-            res.send(data);
+            // Save userdata
+            var users = data;
+            // Get all usertags
+            userModel.getUserTags.then(function (tags) {
+                users.forEach(user => {
+                    user.tags = [];
+                    tags.forEach(tag =>{
+                        if(tag.user_id === user.id){
+                            user.tags.push(tag);
+                        }
+                    })
+                });
+                res.send(users);
+            }).catch(function (err) {
+                res.send(err);
+            });
         }).catch(function (err) {
             res.send(err);
         });

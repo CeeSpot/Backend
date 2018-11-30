@@ -16,6 +16,15 @@ module.exports = {
             }
         })
     }),
+    getUserTags: new Promise(function (resolve, reject) {
+        con.query("SELECT u.id AS user_id, t.* FROM tags t LEFT JOIN user_tags ut ON ut.tag_id=t.id LEFT JOIN users u ON u.id=ut.user_id", function (err, res) {
+            if (err) {
+                reject(err)
+            } else {
+                resolve(res);
+            }
+        })
+    }),
     registerUser: function (req) {
         return new Promise(function (resolve, reject) {
             var username = req.body.username;
