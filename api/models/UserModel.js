@@ -10,9 +10,13 @@ module.exports = {
     getUsers: new Promise(function (resolve, reject) {
         con.query("SELECT * FROM users", function (err, res) {
             if (err) {
-                reject(err)
+                reject({success: false, message: err.toString()});
             } else {
-                resolve(res);
+                let users = [];
+                res.forEach(function (i) {
+                   users.push(entities.getJsonObjectFromDatabaseObject(i,{password:true}))
+                });
+                resolve({success:true, message:users});
             }
         })
     }),
