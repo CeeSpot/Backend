@@ -11,6 +11,7 @@ exports.getUsers = function (req, res) {
 };
 
 exports.registerUser = function (req, res) {
+    console.log("kasdiajsn");
     userModel.registerUser(req).then(function (data) {
         res.send(data);
     }).catch(function (err) {

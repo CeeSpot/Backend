@@ -10,17 +10,18 @@ module.exports = {
     getUsers: new Promise(function (resolve, reject) {
         con.query("SELECT * FROM users", function (err, res) {
             if (err) {
-                reject({success: false, message: err.toString()});
+                reject({success: false, message: "Something went wrong"});
             } else {
                 let users = [];
                 res.forEach(function (i) {
-                   users.push(entities.getJsonObjectFromDatabaseObject(i,{password:true}))
+                   users.push(entities.getJsonObjectFromDatabaseObject(i,{password:true, username:true}))
                 });
                 resolve({success:true, message:users});
             }
         })
     }),
     registerUser: function (req) {
+        console.log("kasdiajsasdsan");
         return new Promise(function (resolve, reject) {
             var username = req.body.username;
             con.query("SELECT username from users WHERE username = ? ORDER BY username LIMIT 1", [username], function (err, results, fields) {
@@ -28,7 +29,7 @@ module.exports = {
                     reject(err) // Something went wrong
                 }
                 if (results.length > 0) {
-                    reject("Username already exists"); // User exists
+                    reject({success: false, message: "Username already exists"}); // User exists
                 } else {
                     bcrypt.genSalt(10, function (err, salt) {
                         bcrypt.hash(req.body.password, salt, function (err, hash) {
@@ -41,9 +42,9 @@ module.exports = {
                                     username: username,
                                     password: hash,
                                     prefix: req.body.prefix,
-                                    first_name: req.body.firstName,
+                                    first_name: req.body.firstname,
                                     insertions: typeof req.body.insertions !== 'undefined' ? req.body.insertions : null,
-                                    last_name: req.body.lastName,
+                                    last_name: req.body.lastname,
                                     address: req.body.address,
                                     zipcode: req.body.zipcode,
                                     city: req.body.city,
@@ -54,7 +55,6 @@ module.exports = {
                                 // Insert the new user
                                 con.query('INSERT INTO users SET ?', post, function (err, res) {
                                     if (err) {
-                                        console.log(err);
                                         reject({success: false, message: "Failed to insert user"});
                                     } else {
                                         var user_id = res.insertId;
@@ -63,7 +63,6 @@ module.exports = {
                                             user_role_id: 1000
                                         };
                                         var company_id = req.body.company_id;
-                                        console.log("company id: " + company_id);
 
                                         con.query('INSERT INTO user_user_roles SET ?', user_user_role_insert, function (err,res) {
                                            if(err){
@@ -128,11 +127,11 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             let userid = req.param("userId");
             con.query("SELECT * FROM users WHERE id = ?", [userid], function (err, results) {
-                if (err) reject({success: false, message: err.toString()}); // return the error ? (up for debate)
+                if (err) reject({success: false, message: "Something went wrong"}); // return the error ? (up for debate)
                 if (results.length === 0) {
                     reject({success: false, message: "No users found"});
                 } else {
-                    let user = entities.getJsonObjectFromDatabaseObject(results[0], {password: true});
+                    let user = entities.getJsonObjectFromDatabaseObject(results[0], {password: true, username: true});
                     con.query(`SELECT companies.id, companies.name, companies.description 
                                FROM user_companies 
                                INNER JOIN companies ON user_companies.company_id = companies.id 
@@ -144,7 +143,6 @@ module.exports = {
                             res.forEach(function (i) {
                                 user.companies.push(entities.getJsonObjectFromDatabaseObject(i));
                             });
-                            console.log(user);
                         }
                         resolve({
                             success:true,
@@ -161,7 +159,7 @@ module.exports = {
                                FROM user_companies 
                                INNER JOIN companies ON user_companies.company_id = companies.id 
                                WHERE user_companies.user_id = ?`, req.user.id, function (err, res) {
-                if(err) reject({success: false, message: err.toString()});
+                if(err) reject({success: false, user: "Something went wrong"});
                 if(res.length > 0){
                     // Might have more than one company associated, thus return all of them
                     req.user.companies = [];

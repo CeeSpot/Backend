@@ -11,10 +11,10 @@ let entities = require('./Entities');
 function getUserByUsername(username) {
     return new Promise(function (resolve, reject) {
         con.query("SELECT * from users WHERE username = ? ORDER BY username LIMIT 1", [username], function (err, results) {
-            if (err) reject({userFound: null, message: err.toString()});
+            if (err) reject({userFound: null, message: "Failed to authenticate user"});
 
             if (results.length === 0) {
-                resolve({userFound: false, message: "No users found with this username"});
+                resolve({userFound: false, message: "Username and password do not match"});
             } else {
                 var user =entities.getJsonObjectFromDatabaseObject(results[0]);
                 resolve({
@@ -38,8 +38,7 @@ function comparePassword(candidatePassword, hash) {
         bcrypt.compare(candidatePassword, hash, function (err, isMatch) {
             if (err) reject({userFound: null, message: err.toString()});
             if (!isMatch) {
-                console.log("error: invalid password");
-                resolve({isMatch: false, message: "Invalid password"});
+                resolve({isMatch: false, message: "Username and password do not match"});
             } else {
                 resolve({isMatch: true});
             }
