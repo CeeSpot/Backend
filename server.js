@@ -13,8 +13,10 @@ app.use(bodyParser.json());
 
 var users = require('./api/routes/UserRoutes'); //importing route
 var companies = require('./api/routes/CompanyRoutes'); //importing route
+var tags = require('./api/routes/TagRoutes'); //importing route
 
 users(app); //register the route
 companies(app); //register the route
+tags(app); //register the route
 
 console.log('the cee spot RESTful API server started on: ' + port);
