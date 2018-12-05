@@ -23,3 +23,19 @@ exports.getEvents = function (req, res) {
         res.send(err);
     });
 };
+
+exports.addUserEvent = function (req, res) {
+    eventModel.addUserEvent(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
+
+exports.removeUserEvent = function (req, res) {
+    eventModel.removeUserEvent(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
