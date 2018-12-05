@@ -10,5 +10,14 @@ module.exports = {
                 resolve(res);
             }
         })
+    }),
+    getUserEvents: new Promise(function (resolve, reject) {
+        con.query("SELECT * FROM user_events WHERE user_id = 1", function (err, res) {
+            if (err) {
+                reject(err)
+            } else {
+                resolve(res);
+            }
+        })
     })
 };
