@@ -3,9 +3,9 @@
 var eventModel = require('../models/EventModel');
 
 exports.getEvents = function (req, res) {
-    eventModel.getEvents.then(function (data) {
+    eventModel.getEvents().then(function (data) {
         let events = data;
-        eventModel.getUserEvents.then(function (data_user) {
+        eventModel.getUserEvents().then(function (data_user) {
             let user_events = data_user;
             events.forEach(event => {
                 user_events.forEach(user_event => {
@@ -34,6 +34,7 @@ exports.addUserEvent = function (req, res) {
 
 exports.removeUserEvent = function (req, res) {
     eventModel.removeUserEvent(req).then(function (data) {
+        console.log("im in user event remove");
         res.send(data);
     }).catch(function (err) {
         res.send(err);
