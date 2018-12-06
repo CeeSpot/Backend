@@ -4,7 +4,7 @@ var userModel = require('../models/UserModel');
 
 exports.getUsers = function (req, res) {
         // Get All users
-        userModel.getUsers.then(function (data) {
+        userModel.getUsers().then(function (data) {
             // Save userdata
             var success = data.success;
             var users = data.message;

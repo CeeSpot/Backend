@@ -7,28 +7,32 @@ let entities = require('./Entities/Entities');
 
 
 module.exports = {
-    getUsers: new Promise(function (resolve, reject) {
-        con.query("SELECT * FROM users", function (err, res) {
-            if (err) {
-                reject({success: false, message: "Something went wrong"});
-            } else {
-                let users = [];
-                res.forEach(function (i) {
-                   users.push(entities.getJsonObjectFromDatabaseObject(i,{password:true, username:true}))
-                });
-                resolve({success:true, message:users});
-            }
+    getUsers: function () {
+        return new Promise(function (resolve, reject) {
+            con.query("SELECT * FROM users", function (err, res) {
+                if (err) {
+                    reject({success: false, message: "Something went wrong"});
+                } else {
+                    let users = [];
+                    res.forEach(function (i) {
+                        users.push(entities.getJsonObjectFromDatabaseObject(i,{password:true, username:false}))
+                    });
+                    resolve({success:true, message:users});
+                }
+            })
+        });
+    },
+    getUserTags: function () {
+        return new Promise(function (resolve, reject) {
+            con.query("SELECT u.id AS user_id, t.* FROM tags t LEFT JOIN user_tags ut ON ut.tag_id=t.id LEFT JOIN users u ON u.id=ut.user_id", function (err, res) {
+                if (err) {
+                    reject(err)
+                } else {
+                    resolve(res);
+                }
+            })
         })
-    }),
-    getUserTags: new Promise(function (resolve, reject) {
-        con.query("SELECT u.id AS user_id, t.* FROM tags t LEFT JOIN user_tags ut ON ut.tag_id=t.id LEFT JOIN users u ON u.id=ut.user_id", function (err, res) {
-            if (err) {
-                reject(err)
-            } else {
-                resolve(res);
-            }
-        })
-    }),
+    },
     registerUser: function (req) {
         console.log("kasdiajsasdsan");
         return new Promise(function (resolve, reject) {
@@ -153,6 +157,10 @@ module.exports = {
                                 user.companies.push(entities.getJsonObjectFromDatabaseObject(i));
                             });
                         }
+                        console.log("----------- USER PROFILE -----------");
+                        console.log(JSON.stringify(user));
+                        console.log("----------- USER PROFILE -----------");
+                        console.log("\r\n\r\n");
                         resolve({
                             success:true,
                             user:user

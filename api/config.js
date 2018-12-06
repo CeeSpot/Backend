@@ -4,10 +4,10 @@
 var mysql = require('mysql');
 
 con = mysql.createConnection({
-    host: "sql7.freesqldatabase.com",
-    user: "sql7267229",
-    password: "yR2KEAmxt1",
-    database: "sql7267229"
+    host: "194.145.201.29",
+    user: "ceespot",
+    password: "ceespot",
+    database: "the_cee_database"
 });
 
 con.connect(function(err) {
