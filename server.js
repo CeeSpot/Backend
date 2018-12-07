@@ -16,13 +16,13 @@ var companies = require('./api/routes/CompanyRoutes'); //importing route
 var tags = require('./api/routes/TagRoutes'); //importing route
 var events = require('./api/routes/EventRoutes'); //importing route
 
-app.set('etag', false);
-
-app.use(function (req, res, next) {
-    res.header('Cache-Control', 'private, no-cache, must-revalidate, private');
-    // res.json(res.JSONResponse);\
-    next()
-});
+// app.set('etag', false);
+//
+// app.use(function (req, res, next) {
+//     res.header('Cache-Control', 'private, no-cache, must-revalidate, private');
+//     // res.json(res.JSONResponse);\
+//     next()
+// });
 
 users(app); //register the route
 companies(app); //register the route
