@@ -53,5 +53,37 @@ module.exports = {
                 }
             })
         })
+    },
+    addEvent: function (req) {
+        return new Promise(function (resolve, reject) {
+            con.query("INSERT INTO events SET ?", {
+                title: req.body.title,
+                description: req.body.description,
+                start: req.body.start,
+                end: req.body.end
+            }, function (err, res) {
+                if (err) {
+                    reject(err)
+                } else {
+                    resolve(res);
+                }
+            })
+        })
+    },
+    deleteEvent: function (req) {
+        return new Promise(function (resolve, reject) {
+            console.log(req.body.event_id);
+            con.query("DELETE FROM events WHERE id = ?", [
+                req.body.event_id
+            ], function (err, res) {
+                if (err) {
+                    console.log(err);
+                    reject(err)
+                } else {
+                    console.log(res);
+                    resolve(res);
+                }
+            })
+        })
     }
 };

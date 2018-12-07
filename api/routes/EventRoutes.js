@@ -8,5 +8,7 @@ module.exports = function (app) {
     app.route('/api/events/userevent')
         .post(eventController.addUserEvent)
         .delete(eventController.removeUserEvent);
+    app.route('/api/events/add').post(eventController.addEvent);
+    app.route('/api/events/delete').delete(eventController.deleteEvent);
     // app.route('/api/events/userevent/remove').post(eventController.removeUserEvent);
 };

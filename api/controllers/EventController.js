@@ -40,3 +40,19 @@ exports.removeUserEvent = function (req, res) {
         res.send(err);
     });
 };
+
+exports.addEvent = function (req, res) {
+    eventModel.addEvent(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
+
+exports.deleteEvent = function (req, res) {
+    eventModel.deleteEvent(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
