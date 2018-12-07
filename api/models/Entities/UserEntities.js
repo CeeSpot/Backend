@@ -13,10 +13,11 @@ function getUserByUsername(username) {
         con.query("SELECT * from users WHERE username = ? ORDER BY username LIMIT 1", [username], function (err, results) {
             if (err) reject({userFound: null, message: "Failed to authenticate user"});
 
-            if (results.length === 0) {
+            if (typeof results === 'undefined' || results.length === 0) {
+                // console.log("results: " + JSON.str);
                 resolve({userFound: false, message: "Username and password do not match"});
             } else {
-                var user =entities.getJsonObjectFromDatabaseObject(results[0]);
+                let user =entities.getJsonObjectFromDatabaseObject(results[0]);
                 resolve({
                     userFound: true,
                     user: user

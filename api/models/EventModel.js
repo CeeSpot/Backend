@@ -6,50 +6,77 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             con.query("SELECT * FROM events", function (err, res) {
                 if (err) {
-                    reject(err)
+                    reject({
+                        success:false,
+                        message: "Failed to get events."
+                    })
                 } else {
-                    resolve(res);
+                    resolve({
+                        success: true,
+                        message: res
+                    });
                 }
             })
         });
     },
-    getUserEvents: function () {
+    getUserEvents: function (user) {
+        console.log(user.id);
         return new Promise(function (resolve, reject) {
-            con.query("SELECT * FROM user_events WHERE user_id = 1", function (err, res) {
+            con.query("SELECT * FROM user_events WHERE user_id = ?", [user.id], function (err, res) {
                 if (err) {
-                    reject(err)
+                    reject({
+                        success: false,
+                        message: "failed to get user event"
+                    });
                 } else {
-                    resolve(res);
+                    // console.log(res);
+                    resolve({
+                        success: true,
+                        message: res
+                    });
                 }
             })
         });
     },
     addUserEvent: function (req) {
+        console.log(req.user);
         return new Promise(function (resolve, reject) {
-            var user_id = 1;
+            var user_id = req.user.id;
             var event_id = req.body.event_id;
             con.query("INSERT INTO user_events SET ?", {
                 user_id: user_id,
                 event_id: event_id
             }, function (err, res) {
                 if (err) {
-                    reject(err)
+                    reject({
+                        success: false,
+                        message: "Failed to assign you to this event!"
+                    })
                 } else {
-                    resolve(res);
+                    resolve({
+                        success: true,
+                        message: res
+                    });
                 }
             })
         })
     },
     removeUserEvent: function (req) {
         return new Promise(function (resolve, reject) {
-            var user_id = 1;
-            var event_id = req.body.event_id;
-            console.log(event_id);
-            con.query("DELETE FROM user_events WHERE user_id = "+ user_id +" AND event_id = " + event_id, function (err, res) {
+            // var user_id = req.user.id;
+            // var event_id = req.body.event_id;
+            // console.log(event_id);
+            con.query("DELETE FROM user_events WHERE user_id = ? AND event_id = ?", [req.user.id, req.body.event_id], function (err, res) {
                 if (err) {
-                    reject(err)
+                    reject({
+                        success: false,
+                        message: "Failed to remove from the event"
+                    })
                 } else {
-                    resolve(res);
+                    resolve({
+                        success: true,
+                        message: "Successfully removed from the event"
+                    });
                 }
             })
         })

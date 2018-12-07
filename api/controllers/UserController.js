@@ -8,12 +8,12 @@ exports.getUsers = function (req, res) {
             // Save userdata
             var success = data.success;
             var users = data.message;
-            
+
             // Get all usertags
-            userModel.getUserTags.then(function (tags) {
+            userModel.getUserTags().then(function (tags) {
                 users.forEach(user => {
                     user.tags = [];
-                    tags.forEach(tag =>{
+                    tags.message.forEach(tag =>{
                         if(tag.user_id === user.id){
                             user.tags.push(tag);
                         }

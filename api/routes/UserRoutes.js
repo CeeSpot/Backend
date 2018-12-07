@@ -10,5 +10,5 @@ module.exports = function (app) {
     app.route('/api/users/register').post(userController.registerUser);
     app.route('/api/users/authenticate').post(userController.authenticate);
     app.route('/api/users/profile/:userId').get(userController.profile);
-    app.route('/api/users/me').get(auth,userController.me);
+    app.route('/api/users/me').get(auth.verifyToken,userController.me);
 };
