@@ -21,30 +21,27 @@ function verifyToken(req, res, next) {
 function verifyFunctionToken(req, optional = false) {
     return new Promise(function (resolve, reject) {
         let token = req.headers['x-access-token'];
-        console.log(token);
-        jwt.verify(token, config.secret, function (err, decoded) {
-            if (err) {
-                if (!optional) {
-                    reject({
-                        success: false,
-                        auth: false,
-                        message: 'Failed to authenticate token'
-                    });
-                }else{
-                    resolve({
-                        success: true,
-                        auth: false,
-                        data: '',
-                        error: err
-                    })
-                }
+        if((typeof token === 'undefined') || (token === null)){
+            if (!optional) {
+                reject({success: false, auth: false, message: 'Failed to authenticate token'});
+            }else{
+                resolve({success: true, auth: false, data: '', error: 'No token given'});
             }
-            // if everything good, save to request for use in other routes
-            resolve({
-                success: true,
-                data: decoded
-            })
-        });
+        }else {
+            console.log("token" + token);
+            jwt.verify(token, config.secret, function (err, decoded) {
+                if (err) {
+                    if (!optional) {
+                        reject({success: false,auth: false, message: 'Failed to authenticate token'
+                        });
+                    } else {
+                        resolve({success: true, auth: false, data: '', error: err})
+                    }
+                }
+                // if everything good, save to request for use in other routes
+                resolve({success: true, data: decoded });
+            });
+        }
     });
 }
 // module.exports = verifyToken;

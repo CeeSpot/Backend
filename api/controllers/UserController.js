@@ -59,3 +59,10 @@ exports.me = function (req,res) {
         res.send(err);
     });
 };
+exports.updateMe = function (req,res) {
+    userModel.updateMe(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};

@@ -15,9 +15,9 @@ module.exports = {
                 } else {
                     let users = [];
                     res.forEach(function (i) {
-                        users.push(entities.getJsonObjectFromDatabaseObject(i,{password:true, username:false}))
+                        users.push(entities.getJsonObjectFromDatabaseObject(i, {password: true, username: false}))
                     });
-                    resolve({success:true, message:users});
+                    resolve({success: true, message: users});
                 }
             })
         });
@@ -78,31 +78,43 @@ module.exports = {
                                     } else {
                                         var user_id = res.insertId;
                                         var user_user_role_insert = {
-                                            user_id : user_id,
+                                            user_id: user_id,
                                             user_role_id: 1000
                                         };
                                         var company_id = req.body.company_id;
 
-                                        con.query('INSERT INTO user_user_roles SET ?', user_user_role_insert, function (err,res) {
-                                           if(err){
-                                               reject({success:false, message: "Failed to assign a user to a user role"});
-                                           }else{
-                                               if(typeof company_id !== 'undefined' && company_id !== null && company_id > -1){
-                                                   var user_company_insert = {
+                                        con.query('INSERT INTO user_user_roles SET ?', user_user_role_insert, function (err, res) {
+                                            if (err) {
+                                                reject({
+                                                    success: false,
+                                                    message: "Failed to assign a user to a user role"
+                                                });
+                                            } else {
+                                                if (typeof company_id !== 'undefined' && company_id !== null && company_id > -1) {
+                                                    var user_company_insert = {
                                                         user_id: user_id,
                                                         company_id: parseInt(company_id)
-                                                   };
-                                                   con.query('INSERT INTO user_companies SET ?', user_company_insert, function (err,res) {
-                                                        if(err){
-                                                            reject({success: false, message: "Failed to assign you to a company"});
-                                                        }else{
-                                                            resolve({success: true, message: "Successfully created your account"});
+                                                    };
+                                                    con.query('INSERT INTO user_companies SET ?', user_company_insert, function (err, res) {
+                                                        if (err) {
+                                                            reject({
+                                                                success: false,
+                                                                message: "Failed to assign you to a company"
+                                                            });
+                                                        } else {
+                                                            resolve({
+                                                                success: true,
+                                                                message: "Successfully created your account"
+                                                            });
                                                         }
-                                                   })
-                                               }else{
-                                                   resolve({success:true, message: "Successfully created your account"});
-                                               }
-                                           }
+                                                    })
+                                                } else {
+                                                    resolve({
+                                                        success: true,
+                                                        message: "Successfully created your account"
+                                                    });
+                                                }
+                                            }
                                         });
                                     }
                                 });
@@ -124,8 +136,9 @@ module.exports = {
                             reject({success: false, message: passwordData.message.toString()});
                         } else {
                             var user = entities.getJsonObjectFromDatabaseObject(data.user, {password: true});
-                            var token = jwt.sign(user, config.secret, {expiresIn: 86400});
-                            resolve(token);
+                            // var token = jwt.sign(user, config.secret, {expiresIn: 86400});
+                            // entities.signToken(user)
+                            resolve(entities.signToken(user));
                         }
                     }).catch(function (err) {
                         reject({success: false, message: err.message.toString()});
@@ -155,21 +168,17 @@ module.exports = {
                                FROM user_companies 
                                INNER JOIN companies ON user_companies.company_id = companies.id 
                                WHERE user_companies.user_id = ?`, userid, function (err, res) {
-                        if(err) reject({success: false, message: err.toString()});
-                        if(res.length > 0){
+                        if (err) reject({success: false, message: err.toString()});
+                        if (res.length > 0) {
                             // Might have more than one company associated, thus return all of them
                             user.companies = [];
                             res.forEach(function (i) {
                                 user.companies.push(entities.getJsonObjectFromDatabaseObject(i));
                             });
                         }
-                        console.log("----------- USER PROFILE -----------");
-                        console.log(JSON.stringify(user));
-                        console.log("----------- USER PROFILE -----------");
-                        console.log("\r\n\r\n");
                         resolve({
-                            success:true,
-                            user:user
+                            success: true,
+                            user: user
                         });
                     });
                 }
@@ -182,8 +191,8 @@ module.exports = {
                                FROM user_companies 
                                INNER JOIN companies ON user_companies.company_id = companies.id 
                                WHERE user_companies.user_id = ?`, req.user.id, function (err, res) {
-                if(err) reject({success: false, user: "Something went wrong"});
-                if(res.length > 0){
+                if (err) reject({success: false, user: "Something went wrong"});
+                if (res.length > 0) {
                     // Might have more than one company associated, thus return all of them
                     req.user.companies = [];
                     res.forEach(function (i) {
@@ -191,10 +200,37 @@ module.exports = {
                     });
                 }
                 resolve({
-                    success:true,
-                    user:req.user
+                    success: true,
+                    user: req.user
                 });
             });
         });
+    },
+    // updateMe: function (req) {
+    //     return new Promise(function (resolve, reject) {
+    //
+    //     });
+    // }
+    updateMe: function(req) {
+        return new Promise(function (resolve, reject) {
+            if (req.user.username !== req.body.user.username) {
+                userEntities.getUserByUsername(req.body.user.username).then((resp) => {
+                    if (!resp.success) reject(resp);
+                    userEntities.updateUser(req.body.user, req.user.id).then((resp) =>{
+                        resolve(resp);
+                    }).catch((err) => {
+                        reject(err)
+                    });
+                }).catch((err) => {
+                    reject({success: false, message: "Username already exists"});
+                })
+            } else {
+                userEntities.updateUser(req.body.user, req.user.id).then((resp) =>{
+                    resolve(resp);
+                }).catch((err) => {
+                    reject(err)
+                });
+            }
+        })
     }
 };

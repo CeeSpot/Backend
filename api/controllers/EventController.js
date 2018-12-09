@@ -22,7 +22,6 @@ exports.getEvents = function (req, res) {
                     res.send(err);
                 });
             }else{
-                console.log(userData.error);
                 res.send({success: data.success, message: events});
             }
         }).catch(err => {
