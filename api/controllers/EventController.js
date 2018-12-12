@@ -79,3 +79,11 @@ exports.getParticipants = function (req, res) {
         res.send(err);
     });
 };
+
+exports.getEvent = function (req, res) {
+    eventModel.getEvent(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};

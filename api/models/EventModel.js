@@ -153,5 +153,22 @@ module.exports = {
                 }
             })
         });
+    },
+    getEvent: function (req) {
+        return new Promise(function (resolve, reject) {
+            con.query(`SELECT * FROM events WHERE id = ?`, [req.params.event_id], function (err, res) {
+                if (err) {
+                    reject({
+                        success: false,
+                        message: "Failed to get event"
+                    })
+                } else {
+                    resolve({
+                        success: true,
+                        message: res
+                    });
+                }
+            })
+        });
     }
 };
