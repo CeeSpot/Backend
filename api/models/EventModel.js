@@ -112,5 +112,46 @@ module.exports = {
                 }
             })
         })
+    },
+    updateEvent: function (req) {
+        return new Promise(function (resolve, reject) {
+            console.log(req.body.event_id);
+            con.query("UPDATE events SET title = ?, description = ?, start = ?, end = ? WHERE id = ?", [
+                req.body.title,
+                req.body.description,
+                req.body.start,
+                req.body.end,
+                req.body.event_id
+            ], function (err, res) {
+                if (err) {
+                    console.log(err);
+                    reject(err)
+                } else {
+                    console.log(res);
+                    resolve(res);
+                }
+            })
+        })
+    },
+    getParticipants: function (req) {
+        console.log(req.params.event_id);
+        return new Promise(function (resolve, reject) {
+            con.query(`SELECT u.username AS username, u.id AS user_id, e.id AS event_id FROM events e
+            LEFT JOIN user_events ue ON ue.event_id=e.id
+            LEFT JOIN users u ON u.id=ue.user_id
+            WHERE e.id = ?`, [req.params.event_id], function (err, res) {
+                if (err) {
+                    reject({
+                        success:false,
+                        message: "Failed to get event participants."
+                    })
+                } else {
+                    resolve({
+                        success: true,
+                        message: res
+                    });
+                }
+            })
+        });
     }
 };

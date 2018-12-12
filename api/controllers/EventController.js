@@ -63,3 +63,19 @@ exports.deleteEvent = function (req, res) {
         res.send(err);
     });
 };
+
+exports.updateEvent = function (req, res) {
+    eventModel.updateEvent(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
+
+exports.getParticipants = function (req, res) {
+    eventModel.getParticipants(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
