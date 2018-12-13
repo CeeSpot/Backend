@@ -12,7 +12,7 @@ exports.getEvents = function (req, res) {
                     events.forEach(event => {
                         user_events.forEach(user_event => {
                             if (event.id === user_event.event_id) {
-                                event.color = '#00FF00';
+                                event.color = '#4BB543';
                                 event.attend = true;
                             }
                         });
