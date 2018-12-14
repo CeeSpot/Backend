@@ -5,6 +5,7 @@ module.exports = function (app) {
 
     // example Routes
     app.route('/api/events').get(eventController.getEvents);
+    app.route('/api/event/:event_id').get(eventController.getEvent);
     app.route('/api/events/add').post(eventController.addEvent);
     app.route('/api/events/delete').delete(eventController.deleteEvent);
     app.route('/api/events/update').put(eventController.updateEvent);

@@ -3,24 +3,23 @@ var config = require('../config');
 
 module.exports = {
     getEvents: function () {
-        return new Promise(function (resolve, reject) {
-            con.query("SELECT * FROM events", function (err, res) {
-                if (err) {
-                    reject({
-                        success:false,
-                        message: "Failed to get events."
-                    })
-                } else {
-                    resolve({
-                        success: true,
-                        message: res
-                    });
-                }
-            })
-        });
+            return new Promise(function (resolve, reject) {
+                con.query("SELECT * FROM events", function (err, res) {
+                    if (err) {
+                        reject({
+                            success:false,
+                            message: "Failed to get events."
+                        })
+                    } else {
+                        resolve({
+                            success: true,
+                            message: res
+                        });
+                    }
+                })
+            });
     },
     getUserEvents: function (user) {
-        console.log(user.id);
         return new Promise(function (resolve, reject) {
             con.query("SELECT * FROM user_events WHERE user_id = ?", [user.id], function (err, res) {
                 if (err) {
@@ -39,7 +38,6 @@ module.exports = {
         });
     },
     addUserEvent: function (req) {
-        console.log(req.user);
         return new Promise(function (resolve, reject) {
             var user_id = req.user.id;
             var event_id = req.body.event_id;
@@ -62,17 +60,17 @@ module.exports = {
         })
     },
     removeUserEvent: function (req) {
+        console.log(req);
         return new Promise(function (resolve, reject) {
-            // var user_id = req.user.id;
-            // var event_id = req.body.event_id;
-            // console.log(event_id);
-            con.query("DELETE FROM user_events WHERE user_id = ? AND event_id = ?", [req.user.id, req.body.event_id], function (err, res) {
+            con.query("DELETE FROM user_events WHERE user_id = ? AND event_id = ?", [req.body.user_id, req.body.event_id], function (err, res) {
                 if (err) {
+                    console.log(err)
                     reject({
                         success: false,
                         message: "Failed to remove from the event"
                     })
                 } else {
+                    console.log(res)
                     resolve({
                         success: true,
                         message: "Successfully removed from the event"
@@ -99,7 +97,6 @@ module.exports = {
     },
     deleteEvent: function (req) {
         return new Promise(function (resolve, reject) {
-            console.log(req.body.event_id);
             con.query("DELETE FROM events WHERE id = ?", [
                 req.body.event_id
             ], function (err, res) {
@@ -115,7 +112,6 @@ module.exports = {
     },
     updateEvent: function (req) {
         return new Promise(function (resolve, reject) {
-            console.log(req.body.event_id);
             con.query("UPDATE events SET title = ?, description = ?, start = ?, end = ? WHERE id = ?", [
                 req.body.title,
                 req.body.description,
@@ -133,13 +129,29 @@ module.exports = {
             })
         })
     },
-    getParticipants: function (req) {
-        console.log(req.params.event_id);
+    getParticipants: function (event_id) {
         return new Promise(function (resolve, reject) {
-            con.query(`SELECT u.username AS username, u.id AS user_id, e.id AS event_id FROM events e
+            con.query(`SELECT u.username AS username, u.id AS user_id FROM events e
             LEFT JOIN user_events ue ON ue.event_id=e.id
             LEFT JOIN users u ON u.id=ue.user_id
-            WHERE e.id = ?`, [req.params.event_id], function (err, res) {
+            WHERE e.id = ?`, [event_id], function (err, res) {
+                if (err) {
+                    reject({
+                        success:false,
+                        message: "Failed to get event participants."
+                    })
+                } else {
+                    resolve({
+                        success: true,
+                        message: res
+                    });
+                }
+            })
+        });
+    },
+    getEvent: function (req) {
+        return new Promise(function (resolve, reject) {
+            con.query(`SELECT * FROM events WHERE id = ?`, [req.params.event_id], function (err, res) {
                 if (err) {
                     reject({
                         success:false,

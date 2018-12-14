@@ -79,3 +79,26 @@ exports.getParticipants = function (req, res) {
         res.send(err);
     });
 };
+
+exports.getEvent = function (req, res) {
+    eventModel.getEvent(req).then(function (data) {
+        let event = data.message[0];
+        event.participants = [];
+
+        // Get event participants
+        eventModel.getParticipants(event.id).then(function (p_data) {
+            var participants = p_data.message;
+            participants.forEach(participant => {
+                var object = {username: participant.username, id: participant.user_id}
+                event.participants.push(object);
+            })
+
+            res.send({success: data.success, message: event});
+        }).catch(function (err) {
+            res.send(err);
+        });
+
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
