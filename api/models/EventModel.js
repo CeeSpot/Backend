@@ -131,8 +131,8 @@ module.exports = {
     },
     getParticipants: function (event_id) {
         return new Promise(function (resolve, reject) {
-            con.query(`SELECT u.username AS username, u.id AS user_id FROM events e
-            LEFT JOIN user_events ue ON ue.event_id=e.id
+            con.query(`SELECT u.username AS username, u.id AS user_id, e.id AS event_id, u.first_name, u.insertions, u.last_name FROM events e
+            INNER JOIN user_events ue ON ue.event_id=e.id
             LEFT JOIN users u ON u.id=ue.user_id
             WHERE e.id = ?`, [event_id], function (err, res) {
                 if (err) {
@@ -154,8 +154,8 @@ module.exports = {
             con.query(`SELECT * FROM events WHERE id = ?`, [req.params.event_id], function (err, res) {
                 if (err) {
                     reject({
-                        success:false,
-                        message: "Failed to get event participants."
+                        success: false,
+                        message: "Failed to get event"
                     })
                 } else {
                     resolve({

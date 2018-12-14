@@ -12,7 +12,7 @@ exports.getEvents = function (req, res) {
                     events.forEach(event => {
                         user_events.forEach(user_event => {
                             if (event.id === user_event.event_id) {
-                                event.color = '#00FF00';
+                                event.color = '#4BB543';
                                 event.attend = true;
                             }
                         });
@@ -89,15 +89,14 @@ exports.getEvent = function (req, res) {
         eventModel.getParticipants(event.id).then(function (p_data) {
             var participants = p_data.message;
             participants.forEach(participant => {
-                var object = {username: participant.username, id: participant.user_id}
+                var object = {username: participant.username, id: participant.user_id};
                 event.participants.push(object);
-            })
+            });
 
             res.send({success: data.success, message: event});
         }).catch(function (err) {
             res.send(err);
         });
-
     }).catch(function (err) {
         res.send(err);
     });
