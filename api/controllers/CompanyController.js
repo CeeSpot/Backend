@@ -9,3 +9,11 @@ exports.getCompanies = function (req, res) {
             res.send(err);
         });
 };
+
+exports.getCompany = function (req, res) {
+    companyModel.getCompany(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};

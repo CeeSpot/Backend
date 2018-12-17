@@ -60,17 +60,16 @@ module.exports = {
         })
     },
     removeUserEvent: function (req) {
-        console.log(req);
         return new Promise(function (resolve, reject) {
-            con.query("DELETE FROM user_events WHERE user_id = ? AND event_id = ?", [req.body.user_id, req.body.event_id], function (err, res) {
+            con.query("DELETE FROM user_events WHERE user_id = ? AND event_id = ?", [req.user.id, req.body.event_id], function (err, res) {
                 if (err) {
-                    console.log(err)
+                    console.log(err);
                     reject({
                         success: false,
                         message: "Failed to remove from the event"
                     })
                 } else {
-                    console.log(res)
+                    console.log(res);
                     resolve({
                         success: true,
                         message: "Successfully removed from the event"
@@ -112,12 +111,20 @@ module.exports = {
     },
     updateEvent: function (req) {
         return new Promise(function (resolve, reject) {
-            con.query("UPDATE events SET title = ?, description = ?, start = ?, end = ? WHERE id = ?", [
+            con.query(`UPDATE events SET title = ?, description = ?, start = ?, end = ?,
+                small_description = ?, location_name = ?, location_street = ?, location_postalcode = ?,
+                 location_number = ?, location_city = ? WHERE id = ?`, [
                 req.body.title,
                 req.body.description,
                 req.body.start,
                 req.body.end,
-                req.body.event_id
+                req.body.small_description,
+                req.body.location_name,
+                req.body.location_street,
+                req.body.location_postalcode,
+                req.body.location_number,
+                req.body.location_city,
+                req.body.id
             ], function (err, res) {
                 if (err) {
                     console.log(err);

@@ -10,5 +10,22 @@ module.exports = {
                 resolve(res);
             }
         })
-    })
+    }),
+    getCompany: function (req) {
+        return new Promise(function (resolve, reject) {
+            con.query(`SELECT * FROM companies WHERE id = ?`, [req.params.company_id], function (err, res) {
+                if (err) {
+                    reject({
+                        success: false,
+                        message: "Failed to get event"
+                    })
+                } else {
+                    resolve({
+                        success: true,
+                        message: res
+                    });
+                }
+            })
+        });
+    }
 };
