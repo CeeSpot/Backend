@@ -89,7 +89,7 @@ exports.getEvent = function (req, res) {
         eventModel.getParticipants(event.id).then(function (p_data) {
             var participants = p_data.message;
             participants.forEach(participant => {
-                var object = {username: participant.username, id: participant.user_id};
+                var object = {username: participant.username, id: participant.user_id, first_name: participant.first_name, insertions: participant.insertions, last_name: participant.last_name};
                 event.participants.push(object);
             });
             res.send({success: data.success, message: event});
