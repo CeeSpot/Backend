@@ -92,7 +92,6 @@ exports.getEvent = function (req, res) {
                 var object = {username: participant.username, id: participant.user_id};
                 event.participants.push(object);
             });
-
             res.send({success: data.success, message: event});
         }).catch(function (err) {
             res.send(err);
