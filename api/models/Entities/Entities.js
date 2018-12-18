@@ -3,6 +3,7 @@
  */
 let jwt = require('jsonwebtoken');
 let config = require('../../config');
+let Enums = require('../../Enums');
 
 /**
  * Create a json object from a database user and exlucde colums in the exluded object
@@ -20,12 +21,14 @@ function getJsonObjectFromDatabaseObject(user, excluded) {
     }
     return userObj;
 }
+
 function signToken(data) {
     let expiresIn = 86400;
     return jwt.sign(data, config.secret, {expiresIn: expiresIn})
 }
 
+
 module.exports = {
     'getJsonObjectFromDatabaseObject': getJsonObjectFromDatabaseObject,
-    'signToken': signToken
+    'signToken': signToken,
 };

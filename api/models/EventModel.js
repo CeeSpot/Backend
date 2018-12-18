@@ -63,9 +63,6 @@ module.exports = {
     },
     removeUserEvent: function (req) {
         return new Promise(function (resolve, reject) {
-            // var user_id = req.user.id;
-            // var event_id = req.body.event_id;
-            // console.log(event_id);
             con.query("DELETE FROM user_events WHERE user_id = ? AND event_id = ?", [req.user.id, req.body.event_id], function (err, res) {
                 if (err) {
                     reject({

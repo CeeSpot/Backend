@@ -3,6 +3,7 @@
  */
 var jwt = require('jsonwebtoken');
 var config = require('./config');
+var Enums = require('./Enums');
 
 function verifyToken(req, res, next) {
     var token = req.headers['x-access-token'];
@@ -15,7 +16,14 @@ function verifyToken(req, res, next) {
         }
         // if everything good, save to request for use in other routes
         req.user = decoded;
-        next();
+        config.con.query("SELECT user_role_id FROM user_user_roles WHERE user_id = ?", [decoded.id], function (err, res) {
+            req.user.isGuestUser = res[0].user_role_id === Enums.userRoles.GUEST_USER;
+            req.user.isFellow = res[0].user_role_id === Enums.userRoles.FELLOW;
+            req.user.isPartner = res[0].user_role_id === Enums.userRoles.PARTNER;
+            req.user.isStandardUser = res[0].user_role_id === Enums.userRoles.STANDARD_USER;
+            req.user.isAdmin = res[0].user_role_id === Enums.userRoles.ADMIN;
+            next();
+        });
     });
 }
 function verifyFunctionToken(req, optional = false) {
@@ -28,7 +36,6 @@ function verifyFunctionToken(req, optional = false) {
                 resolve({success: true, auth: false, data: '', error: 'No token given'});
             }
         }else {
-            console.log("token" + token);
             jwt.verify(token, config.secret, function (err, decoded) {
                 if (err) {
                     if (!optional) {

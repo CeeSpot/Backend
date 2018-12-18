@@ -1,15 +1,16 @@
 'use strict';
 let bcrypt = require('bcryptjs');
-let jwt = require('jsonwebtoken');
 let config = require('../config');
 let userEntities = require('./Entities/UserEntities');
 let entities = require('./Entities/Entities');
-
+let enums = require('../Enums');
+let SocialMediaModel = require('./SocialMediaModel');
+let SocialMediaEntities = require('./Entities/SocialMediaEntities');
 
 module.exports = {
     getUsers: function () {
         return new Promise(function (resolve, reject) {
-            con.query("SELECT * FROM users", function (err, res) {
+            config.con.query("SELECT * FROM users", function (err, res) {
                 if (err) {
                     reject({success: false, message: "Something went wrong"});
                 } else {
@@ -24,7 +25,7 @@ module.exports = {
     },
     getUserTags: function () {
         return new Promise(function (resolve, reject) {
-            con.query("SELECT u.id AS user_id, t.* FROM tags t LEFT JOIN user_tags ut ON ut.tag_id=t.id LEFT JOIN users u ON u.id=ut.user_id", function (err, res) {
+            config.con.query("SELECT u.id AS user_id, t.* FROM tags t LEFT JOIN user_tags ut ON ut.tag_id=t.id LEFT JOIN users u ON u.id=ut.user_id", function (err, res) {
                 if (err) {
                     reject({
                         success: false,
@@ -42,8 +43,8 @@ module.exports = {
     registerUser: function (req) {
         console.log("kasdiajsasdsan");
         return new Promise(function (resolve, reject) {
-            var username = req.body.username;
-            con.query("SELECT username from users WHERE username = ? ORDER BY username LIMIT 1", [username], function (err, results, fields) {
+            let username = req.body.username;
+            config.con.query("SELECT username from users WHERE username = ? ORDER BY username LIMIT 1", [username], function (err, results, fields) {
                 if (err) {
                     reject(err) // Something went wrong
                 }
@@ -56,7 +57,7 @@ module.exports = {
                                 reject({success: false, message: err.toString()});
                             } else {
                                 // Store hash in your password DB.
-                                var post = {
+                                let post = {
                                     email: req.body.email,
                                     username: username,
                                     password: hash,
@@ -72,18 +73,18 @@ module.exports = {
                                 };
 
                                 // Insert the new user
-                                con.query('INSERT INTO users SET ?', post, function (err, res) {
+                                config.con.query('INSERT INTO users SET ?', post, function (err, res) {
                                     if (err) {
                                         reject({success: false, message: "Failed to insert user"});
                                     } else {
-                                        var user_id = res.insertId;
-                                        var user_user_role_insert = {
+                                        let user_id = res.insertId;
+                                        let user_user_role_insert = {
                                             user_id: user_id,
                                             user_role_id: 1000
                                         };
-                                        var company_id = req.body.company_id;
+                                        let company_id = req.body.company_id;
 
-                                        con.query('INSERT INTO user_user_roles SET ?', user_user_role_insert, function (err, res) {
+                                        config.con.query('INSERT INTO user_user_roles SET ?', user_user_role_insert, function (err, res) {
                                             if (err) {
                                                 reject({
                                                     success: false,
@@ -91,11 +92,11 @@ module.exports = {
                                                 });
                                             } else {
                                                 if (typeof company_id !== 'undefined' && company_id !== null && company_id > -1) {
-                                                    var user_company_insert = {
+                                                    let user_company_insert = {
                                                         user_id: user_id,
                                                         company_id: parseInt(company_id)
                                                     };
-                                                    con.query('INSERT INTO user_companies SET ?', user_company_insert, function (err, res) {
+                                                    config.con.query('INSERT INTO user_companies SET ?', user_company_insert, function (err, res) {
                                                         if (err) {
                                                             reject({
                                                                 success: false,
@@ -135,8 +136,8 @@ module.exports = {
                         if (!passwordData.isMatch) {
                             reject({success: false, message: passwordData.message.toString()});
                         } else {
-                            var user = entities.getJsonObjectFromDatabaseObject(data.user, {password: true});
-                            // var token = jwt.sign(user, config.secret, {expiresIn: 86400});
+                            let user = entities.getJsonObjectFromDatabaseObject(data.user, {password: true});
+                            // let token = jwt.sign(user, config.secret, {expiresIn: 86400});
                             // entities.signToken(user)
                             resolve(entities.signToken(user));
                         }
@@ -158,13 +159,13 @@ module.exports = {
     profile: function (req) {
         return new Promise(function (resolve, reject) {
             let userid = req.param("userId");
-            con.query("SELECT * FROM users WHERE id = ?", [userid], function (err, results) {
+            config.con.query("SELECT * FROM users WHERE id = ?", [userid], function (err, results) {
                 if (err) reject({success: false, message: "Something went wrong"}); // return the error ? (up for debate)
                 if (results.length === 0) {
                     reject({success: false, message: "No users found"});
                 } else {
                     let user = entities.getJsonObjectFromDatabaseObject(results[0], {password: true, username: true});
-                    con.query(`SELECT companies.id, companies.name, companies.description 
+                    config.con.query(`SELECT companies.id, companies.name, companies.description 
                                FROM user_companies 
                                INNER JOIN companies ON user_companies.company_id = companies.id 
                                WHERE user_companies.user_id = ?`, userid, function (err, res) {
@@ -187,7 +188,7 @@ module.exports = {
     },
     me: function (req) {
         return new Promise(function (resolve, reject) {
-            con.query(`SELECT companies.id, companies.name, companies.description 
+            config.con.query(`SELECT companies.id, companies.name, companies.description 
                                FROM user_companies 
                                INNER JOIN companies ON user_companies.company_id = companies.id 
                                WHERE user_companies.user_id = ?`, req.user.id, function (err, res) {
@@ -199,10 +200,23 @@ module.exports = {
                         req.user.companies.push(entities.getJsonObjectFromDatabaseObject(i));
                     });
                 }
-                resolve({
-                    success: true,
-                    user: req.user
-                });
+                SocialMediaEntities.getResourceSocialMediaSites(req.user.id, enums.socialMediaRoles.SOCIAL_MEDIA_USER).then((data) => {
+                    req.user.social_media_sites = data;
+
+                    SocialMediaModel.getSites().then((socialMediaSites) => {
+                        resolve({
+                            success: true,
+                            user: req.user,
+                            sites: socialMediaSites.message,
+                            type: enums.socialMediaRoles.SOCIAL_MEDIA_USER
+                        });
+                    }).catch((err) => {
+                        resolve({
+                            success: true,
+                            user: req.user
+                        });
+                    })
+                })
             });
         });
     },

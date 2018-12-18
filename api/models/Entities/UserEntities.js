@@ -1,8 +1,10 @@
 /**
  * Created by thama on 23-11-2018.
  */
-var bcrypt = require('bcryptjs');
+let bcrypt = require('bcryptjs');
 let entities = require('./Entities');
+let config = require('../../config');
+
 /**
  * Gets a user by username
  * @param username
@@ -11,7 +13,7 @@ let entities = require('./Entities');
  */
 function getUserByUsername(username, toRemove = null) {
     return new Promise(function (resolve, reject) {
-        con.query("SELECT * from users WHERE username = ? ORDER BY username LIMIT 1", [username], function (err, results) {
+        config.con.query("SELECT * from users WHERE username = ? ORDER BY username LIMIT 1", [username], function (err, results) {
             if (err) reject({userFound: null, message: "Failed to authenticate user"});
 
             if (typeof results === 'undefined' || results.length === 0) {
@@ -27,15 +29,18 @@ function getUserByUsername(username, toRemove = null) {
         });
     });
 }
-// function updateUser(data, id) {
-//     return new Promise(function (resolve, reject) {
-//        resolve("fuck me daddy");
-//     });
-// }
+
+/**
+ * Updates user data given data and ID
+ *
+ * @param data
+ * @param id
+ * @returns {Promise<any>}
+ */
 function updateUser(data, id) {
     let self = this;
     return new Promise(function (resolve, reject) {
-        con.query("UPDATE users SET ? where id = ?", [data, id], function (err, res) {
+        config.con.query("UPDATE users SET ? where id = ?", [data, id], function (err, res) {
             if (err) reject({success: false, message: err.toString()})
             self.getUserByUsername(data.username, {password: true}).then(userData => {
                 resolve({success: true, message: entities.signToken(userData.user)})
@@ -51,7 +56,6 @@ function updateUser(data, id) {
  * @returns {Promise}
  */
 function comparePassword(candidatePassword, hash) {
-    console.log("candidate password: " + candidatePassword);
     return new Promise(function (resolve, reject) {
         bcrypt.compare(candidatePassword, hash, function (err, isMatch) {
             if (err) reject({userFound: null, message: err.toString()});
