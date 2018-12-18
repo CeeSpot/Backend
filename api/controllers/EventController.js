@@ -12,7 +12,7 @@ exports.getEvents = function (req, res) {
                     events.forEach(event => {
                         user_events.forEach(user_event => {
                             if (event.id === user_event.event_id) {
-                                event.color = '#00FF00';
+                                event.color = '#4BB543';
                                 event.attend = true;
                             }
                         });
@@ -59,6 +59,43 @@ exports.addEvent = function (req, res) {
 exports.deleteEvent = function (req, res) {
     eventModel.deleteEvent(req).then(function (data) {
         res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
+
+exports.updateEvent = function (req, res) {
+    eventModel.updateEvent(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
+
+exports.getParticipants = function (req, res) {
+    eventModel.getParticipants(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
+
+exports.getEvent = function (req, res) {
+    eventModel.getEvent(req).then(function (data) {
+        let event = data.message[0];
+        event.participants = [];
+
+        // Get event participants
+        eventModel.getParticipants(event.id).then(function (p_data) {
+            var participants = p_data.message;
+            participants.forEach(participant => {
+                var object = {username: participant.username, id: participant.user_id, first_name: participant.first_name, insertions: participant.insertions, last_name: participant.last_name};
+                event.participants.push(object);
+            });
+            res.send({success: data.success, message: event});
+        }).catch(function (err) {
+            res.send(err);
+        });
     }).catch(function (err) {
         res.send(err);
     });
