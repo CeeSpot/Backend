@@ -132,9 +132,15 @@ module.exports = {
                 req.body.id
             ], function (err, res) {
                 if (err) {
-                    reject(err)
+                    reject({
+                        success: false,
+                        message: "Failed to update event."
+                    })
                 } else {
-                    resolve(res);
+                    resolve({
+                        success: true,
+                        message: "Successfully updated event."
+                    });
                 }
             })
         })
