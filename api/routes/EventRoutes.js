@@ -4,7 +4,6 @@ var auth = require('../Auth');
 module.exports = function (app) {
 
     // example Routes
-    app.route('/api/event/:event_id').get(eventController.getEvent);
     app.route('/api/events').get(eventController.getEvents);
     app.route('/api/event/:event_id').get(eventController.getEvent);
     app.route('/api/events/add').post(eventController.addEvent);
