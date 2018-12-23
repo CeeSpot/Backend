@@ -60,9 +60,7 @@ function socialMediaUrlMatches(site, urlToMatch) {
 function insertResourceRecord(resourceId, type, record) {
     return new Promise((resolve, reject) => {
         checkIfResourceSiteExists(record.id, resourceId, type).then((data) => {
-            console.log(data);
             if (data === false) {
-                console.log("1");
                 config.con.query("SELECT site FROM social_media WHERE id = ?", [record.id], function (err, res) {
                     // Check if there is an error
                     if (err) reject({success: false, message: "Something went wrong with inserting the site"});
@@ -110,8 +108,6 @@ function updateResourceRecord(record, type) {
     return new Promise((resolve, reject) => {
         checkIfResourceSiteExists(record.social_media_id, record.resource_id, record.type).then((data) => {
             if (data === false) {
-                console.log(" waddup in the club");
-                console.log(record.url);
                 config.con.query("UPDATE social_media_resources SET url = ? WHERE social_media_id = ? AND resource_id = ? AND type = ?",
                     [record.url, record.social_media_id, record.resource_id, type],
                     function (err, res) {

@@ -28,7 +28,6 @@ module.exports = {
         });
     },
     addResourceSite: function (req) {
-        console.log(req.body);
         return new Promise((resolve, reject) => {
             let type = parseInt(req.body.type);
             if (type !== Enums.socialMediaRoles.SOCIAL_MEDIA_USER &&
