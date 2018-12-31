@@ -17,12 +17,12 @@ module.exports = {
                 if (err) {
                     reject({
                         success: false,
-                        message: "Failed to get event"
+                        data: "Failed to get event"
                     })
                 } else {
                     resolve({
                         success: true,
-                        message: res
+                        data: res
                     });
                 }
             })

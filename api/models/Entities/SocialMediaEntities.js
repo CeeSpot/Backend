@@ -10,7 +10,7 @@ function getResourceSocialMediaSites(resourceId, type, excluded = {}) {
                                  INNER JOIN social_media as sm ON smr.social_media_id = sm.id
                           WHERE smr.resource_id = ?
                             AND smr.type = ?`, [resourceId, type], function (err, res) {
-            if (err) reject({success: false, message: "Something went wrong"});
+            if (err) reject({success: false, data: "Something went wrong"});
             else resolve(res)
         });
     });
@@ -63,11 +63,11 @@ function insertResourceRecord(resourceId, type, record) {
             if (data === false) {
                 config.con.query("SELECT site FROM social_media WHERE id = ?", [record.id], function (err, res) {
                     // Check if there is an error
-                    if (err) reject({success: false, message: "Something went wrong with inserting the site"});
+                    if (err) reject({success: false, data: "Something went wrong with inserting the site"});
                     else {
 
                         // Check if there is any data
-                        if (res.length === 0) reject({success: false, message: "Site doesn't exist"});
+                        if (res.length === 0) reject({success: false, data: "Site doesn't exist"});
                         else {
                             let post = {
                                 social_media_id: record.id,
@@ -77,11 +77,11 @@ function insertResourceRecord(resourceId, type, record) {
                             };
 
                             config.con.query("INSERT INTO social_media_resources SET ?", post, function (err, res) {
-                                if (err)  reject({ success: false,message: "Something went wrong with inserting the site" });
+                                if (err)  reject({ success: false,data: "Something went wrong with inserting the site" });
                                 else {
                                     resolve({
                                         success: true,
-                                        message: "Successfully added the social media link"
+                                        data: "Successfully added the social media link"
                                     });
                                 }
                             });
@@ -91,10 +91,10 @@ function insertResourceRecord(resourceId, type, record) {
             } else {
                 reject({
                     success: false,
-                    message: "Social media site " + record.site + " has already been added to this profile"
+                    data: "Social media site " + record.site + " has already been added to this profile"
                 });
             }
-        }).catch((err) => reject({success: true, message: "Something went wrong"}))
+        }).catch((err) => reject({success: true, data: "Something went wrong"}))
     })
 }
 
@@ -111,11 +111,11 @@ function updateResourceRecord(record, type) {
                 config.con.query("UPDATE social_media_resources SET url = ? WHERE social_media_id = ? AND resource_id = ? AND type = ?",
                     [record.url, record.social_media_id, record.resource_id, type],
                     function (err, res) {
-                        if (err) reject({success: false, message: "Failed to update URL for " + record.site});
-                        else resolve({success: true, message: "Successfully updated record"});
+                        if (err) reject({success: false, data: "Failed to update URL for " + record.site});
+                        else resolve({success: true, data: "Successfully updated record"});
                     });
             } else {
-                reject({success: false, message: "Can't update URL for " + record.site + ". Site doesn't exist"});
+                reject({success: false, data: "Can't update URL for " + record.site + ". Site doesn't exist"});
             }
         }).catch((err) => reject(err));
     });
@@ -123,7 +123,7 @@ function updateResourceRecord(record, type) {
 
 function insertResourceRecords(resourceId, type, socialMediaResourceSites) {
     return new Promise((resolve, reject) => {
-        if (socialMediaResourceSites.length === 0) resolve({success: false, message: "No sites given to update"});
+        if (socialMediaResourceSites.length === 0) resolve({success: false, data: "No sites given to update"});
         else {
             let listOfErrors = [];
             let successCounter = 0;
@@ -143,7 +143,7 @@ function insertResourceRecords(resourceId, type, socialMediaResourceSites) {
                         });
                     }
                 }).catch((err) => {
-                    listOfErrors.push(err.message);
+                    listOfErrors.push(err.data);
                     if (i === socialMediaResourceSites.length - 1) {
                         resolve({
                             success: true,
@@ -166,7 +166,7 @@ function insertResourceRecords(resourceId, type, socialMediaResourceSites) {
  */
 function updateResourceRecords(resourceId, type, socialMediaResourceSites) {
     return new Promise((resolve, reject) => {
-        if (socialMediaResourceSites.length === 0) resolve({success: false, message: "No sites given to update"});
+        if (socialMediaResourceSites.length === 0) resolve({success: false, data: "No sites given to update"});
         else {
             let listOfErrors = [];
             let successCounter = 0;
@@ -186,7 +186,7 @@ function updateResourceRecords(resourceId, type, socialMediaResourceSites) {
                         });
                     }
                 }).catch((err) => {
-                    listOfErrors.push(err.message);
+                    listOfErrors.push(err.data);
                     if (i === socialMediaResourceSites.length - 1) {
                         resolve({
                             success: true,

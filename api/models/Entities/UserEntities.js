@@ -14,11 +14,11 @@ let config = require('../../config');
 function getUserByUsername(username, toRemove = null) {
     return new Promise(function (resolve, reject) {
         config.con.query("SELECT * from users WHERE username = ? ORDER BY username LIMIT 1", [username], function (err, results) {
-            if (err) reject({userFound: null, message: "Failed to authenticate user"});
+            if (err) reject({userFound: null, data: "Failed to authenticate user"});
 
             if (typeof results === 'undefined' || results.length === 0) {
                 // console.log("results: " + JSON.str);
-                resolve({userFound: false, message: "Username and password do not match"});
+                resolve({userFound: false, data: "Username and password do not match"});
             } else {
                 let user = !toRemove ? entities.getJsonObjectFromDatabaseObject(results[0]) : entities.getJsonObjectFromDatabaseObject(results[0], toRemove);
                 resolve({
@@ -41,9 +41,9 @@ function updateUser(data, id) {
     let self = this;
     return new Promise(function (resolve, reject) {
         config.con.query("UPDATE users SET ? where id = ?", [data, id], function (err, res) {
-            if (err) reject({success: false, message: err.toString()})
+            if (err) reject({success: false, data: err.toString()})
             self.getUserByUsername(data.username, {password: true}).then(userData => {
-                resolve({success: true, message: entities.signToken(userData.user)})
+                resolve({success: true, data: entities.signToken(userData.user)})
             })
         });
     });
@@ -58,9 +58,9 @@ function updateUser(data, id) {
 function comparePassword(candidatePassword, hash) {
     return new Promise(function (resolve, reject) {
         bcrypt.compare(candidatePassword, hash, function (err, isMatch) {
-            if (err) reject({userFound: null, message: err.toString()});
+            if (err) reject({userFound: null, data: err.toString()});
             if (!isMatch) {
-                resolve({isMatch: false, message: "Username and password do not match"});
+                resolve({isMatch: false, data: "Username and password do not match"});
             } else {
                 resolve({isMatch: true});
             }

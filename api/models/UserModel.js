@@ -12,13 +12,13 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             config.con.query("SELECT * FROM users", function (err, res) {
                 if (err) {
-                    reject({success: false, message: "Something went wrong"});
+                    reject({success: false, data: "Something went wrong"});
                 } else {
                     let users = [];
                     res.forEach(function (i) {
                         users.push(entities.getJsonObjectFromDatabaseObject(i, {password: true, username: false}))
                     });
-                    resolve({success: true, message: users});
+                    resolve({success: true, data: users});
                 }
             })
         });
@@ -29,12 +29,12 @@ module.exports = {
                 if (err) {
                     reject({
                         success: false,
-                        message: "Failed getting user tags"
+                        data: "Failed getting user tags"
                     });
                 } else {
                     resolve({
                         success: true,
-                        message: res
+                        data: res
                     });
                 }
             })
@@ -49,12 +49,12 @@ module.exports = {
                     reject(err) // Something went wrong
                 }
                 if (results.length > 0) {
-                    reject({success: false, message: "Username already exists"}); // User exists
+                    reject({success: false, data: "Username already exists"}); // User exists
                 } else {
                     bcrypt.genSalt(10, function (err, salt) {
                         bcrypt.hash(req.body.password, salt, function (err, hash) {
                             if (err) {
-                                reject({success: false, message: err.toString()});
+                                reject({success: false, data: err.toString()});
                             } else {
                                 // Store hash in your password DB.
                                 let post = {
@@ -75,7 +75,7 @@ module.exports = {
                                 // Insert the new user
                                 config.con.query('INSERT INTO users SET ?', post, function (err, res) {
                                     if (err) {
-                                        reject({success: false, message: "Failed to insert user"});
+                                        reject({success: false, data: "Failed to insert user"});
                                     } else {
                                         let user_id = res.insertId;
                                         let user_user_role_insert = {
@@ -88,7 +88,7 @@ module.exports = {
                                             if (err) {
                                                 reject({
                                                     success: false,
-                                                    message: "Failed to assign a user to a user role"
+                                                    data: "Failed to assign a user to a user role"
                                                 });
                                             } else {
                                                 if (typeof company_id !== 'undefined' && company_id !== null && company_id > -1) {
@@ -100,19 +100,19 @@ module.exports = {
                                                         if (err) {
                                                             reject({
                                                                 success: false,
-                                                                message: "Failed to assign you to a company"
+                                                                data: "Failed to assign you to a company"
                                                             });
                                                         } else {
                                                             resolve({
                                                                 success: true,
-                                                                message: "Successfully created your account"
+                                                                data: "Successfully created your account"
                                                             });
                                                         }
                                                     })
                                                 } else {
                                                     resolve({
                                                         success: true,
-                                                        message: "Successfully created your account"
+                                                        data: "Successfully created your account"
                                                     });
                                                 }
                                             }
@@ -130,11 +130,11 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             userEntities.getUserByUsername(req.body.username).then(function (data) {
                 if (!data.userFound) {
-                    reject({success: false, message: data.message.toString()});
+                    reject({success: false, data: data.data.toString()});
                 } else {
                     userEntities.comparePassword(req.body.password, data.user.password).then(function (passwordData) {
                         if (!passwordData.isMatch) {
-                            reject({success: false, message: passwordData.message.toString()});
+                            reject({success: false, data: passwordData.data.toString()});
                         } else {
                             let user = entities.getJsonObjectFromDatabaseObject(data.user, {password: true});
                             // let token = jwt.sign(user, config.secret, {expiresIn: 86400});
@@ -142,11 +142,11 @@ module.exports = {
                             resolve(entities.signToken(user));
                         }
                     }).catch(function (err) {
-                        reject({success: false, message: err.message.toString()});
+                        reject({success: false, data: err.data.toString()});
                     });
                 }
             }).catch(function (err) {
-                reject({success: false, message: err.message.toString()});
+                reject({success: false, data: err.data.toString()});
             });
         });
     },
@@ -160,16 +160,16 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             let userid = req.param("userId");
             config.con.query("SELECT * FROM users WHERE id = ?", [userid], function (err, results) {
-                if (err) reject({success: false, message: "Something went wrong"}); // return the error ? (up for debate)
+                if (err) reject({success: false, data: "Something went wrong"}); // return the error ? (up for debate)
                 if (results.length === 0) {
-                    reject({success: false, message: "No users found"});
+                    reject({success: false, data: "No users found"});
                 } else {
                     let user = entities.getJsonObjectFromDatabaseObject(results[0], {password: true, username: true});
                     config.con.query(`SELECT companies.id, companies.name, companies.description 
                                FROM user_companies 
                                INNER JOIN companies ON user_companies.company_id = companies.id 
                                WHERE user_companies.user_id = ?`, userid, function (err, res) {
-                        if (err) reject({success: false, message: err.toString()});
+                        if (err) reject({success: false, data: err.toString()});
                         if (res.length > 0) {
                             // Might have more than one company associated, thus return all of them
                             user.companies = [];
@@ -207,7 +207,7 @@ module.exports = {
                         resolve({
                             success: true,
                             user: req.user,
-                            sites: socialMediaSites.message,
+                            sites: socialMediaSites.data,
                             type: enums.socialMediaRoles.SOCIAL_MEDIA_USER
                         });
                     }).catch((err) => {
@@ -236,7 +236,7 @@ module.exports = {
                         reject(err)
                     });
                 }).catch((err) => {
-                    reject({success: false, message: "Username already exists"});
+                    reject({success: false, data: "Username already exists"});
                 })
             } else {
                 userEntities.updateUser(req.body.user, req.user.id).then((resp) =>{

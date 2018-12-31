@@ -7,8 +7,8 @@ module.exports = {
     getSites: function () {
         return new Promise(function (resolve, reject) {
             con.query("SELECT * FROM social_media", function (err, res) {
-                if (err) reject({success: false, message: "Something went wrong"})
-                else resolve({success: true, message: res});
+                if (err) reject({success: false, data: "Something went wrong"})
+                else resolve({success: true, data: res});
             })
         });
     },
@@ -19,11 +19,11 @@ module.exports = {
                     site: req.body.site
                 };
                 config.con.query("INSERT INTO social_media SET ?", post, function (err, res) {
-                    if (err) reject({success: false, message: "Failed to insert new site"});
-                    resolve({success: true, message: "Successfully inserted new social media site"});
+                    if (err) reject({success: false, data: "Failed to insert new site"});
+                    resolve({success: true, data: "Successfully inserted new social media site"});
 
                 })
-            } else reject({success: false, auth: false, message: "You are not authorized to use this function"});
+            } else reject({success: false, auth: false, data: "You are not authorized to use this function"});
 
         });
     },
@@ -33,7 +33,7 @@ module.exports = {
             if (type !== Enums.socialMediaRoles.SOCIAL_MEDIA_USER &&
                 type !== Enums.socialMediaRoles.SOCIAL_MEDIA_COMPANY &&
                 type !== Enums.socialMediaRoles.SOCIAL_MEDIA_EVENT) {
-                reject({success: false, message: "Incorrect type given"});
+                reject({success: false, data: "Incorrect type given"});
             } else {
                 let sites = req.body.sites;
                 let smrs = req.body.social_media_resource_sites;

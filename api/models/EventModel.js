@@ -8,12 +8,12 @@ module.exports = {
                     if (err) {
                         reject({
                             success:false,
-                            message: "Failed to get events."
+                            data: "Failed to get events."
                         })
                     } else {
                         resolve({
                             success: true,
-                            message: res
+                            data: res
                         });
                     }
                 })
@@ -25,13 +25,13 @@ module.exports = {
                 if (err) {
                     reject({
                         success: false,
-                        message: "failed to get user event"
+                        data: "failed to get user event"
                     });
                 } else {
                     // console.log(res);
                     resolve({
                         success: true,
-                        message: res
+                        data: res
                     });
                 }
             })
@@ -49,12 +49,12 @@ module.exports = {
                 if (err) {
                     reject({
                         success: false,
-                        message: "Failed to assign you to this event!"
+                        data: "Failed to assign you to this event!"
                     })
                 } else {
                     resolve({
                         success: true,
-                        message: res
+                        data: res
                     });
                 }
             })
@@ -73,13 +73,13 @@ module.exports = {
                     console.log(err);
                     reject({
                         success: false,
-                        message: "Failed to remove from the event"
+                        data: "Failed to remove from the event"
                     })
                 } else {
                     console.log(res);
                     resolve({
                         success: true,
-                        message: "Successfully removed from the event"
+                        data: "Successfully removed from the event"
                     });
                 }
             })
@@ -134,12 +134,12 @@ module.exports = {
                 if (err) {
                     reject({
                         success: false,
-                        message: "Failed to update event."
+                        data: "Failed to update event."
                     })
                 } else {
                     resolve({
                         success: true,
-                        message: "Successfully updated event."
+                        data: "Successfully updated event."
                     });
                 }
             })
@@ -154,12 +154,12 @@ module.exports = {
                 if (err) {
                     reject({
                         success:false,
-                        message: "Failed to get event participants."
+                        data: "Failed to get event participants."
                     })
                 } else {
                     resolve({
                         success: true,
-                        message: res
+                        data: res
                     });
                 }
             })
@@ -171,12 +171,12 @@ module.exports = {
                 if (err) {
                     reject({
                         success: false,
-                        message: "Failed to get event"
+                        data: "Failed to get event"
                     })
                 } else {
                     resolve({
                         success: true,
-                        message: res
+                        data: res
                     });
                 }
             })
