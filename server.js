@@ -16,6 +16,7 @@ var companies = require('./api/routes/CompanyRoutes'); //importing route
 var tags = require('./api/routes/TagRoutes'); //importing route
 var events = require('./api/routes/EventRoutes'); //importing route
 var socialMedia = require('./api/routes/SocialMediaRoutes'); //importing route
+var blogs = require('./api/routes/BlogRoutes'); //importing route
 
 // app.set('etag', false);
 //
@@ -30,5 +31,6 @@ companies(app); //register the route
 tags(app); //register the route
 events(app); //register the route
 socialMedia(app); //register the route
+blogs(app); //register the route
 
 console.log('the cee spot RESTful API server started on: ' + port);
