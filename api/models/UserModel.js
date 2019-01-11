@@ -7,6 +7,7 @@ let enums = require('../Enums');
 let SocialMediaModel = require('./SocialMediaModel');
 let SocialMediaEntities = require('./Entities/SocialMediaEntities');
 
+let encryptRounds = 10;
 module.exports = {
     getUsers: function () {
         return new Promise(function (resolve, reject) {
@@ -51,7 +52,7 @@ module.exports = {
                 if (results.length > 0) {
                     reject({success: false, data: "Username already exists"}); // User exists
                 } else {
-                    bcrypt.genSalt(10, function (err, salt) {
+                    bcrypt.genSalt(encryptRounds, function (err, salt) {
                         bcrypt.hash(req.body.password, salt, function (err, hash) {
                             if (err) {
                                 reject({success: false, data: err.toString()});
@@ -246,5 +247,47 @@ module.exports = {
                 });
             }
         })
+    },
+    changePassword: function (req) {
+        return new Promise(function (resolve, reject) {
+            userEntities.getUserByUsername(req.user.username).then(function (data) {
+                if (!data.userFound) {
+                    reject({success: false, data: data.data.toString()}); // no user found, should probably logout?
+                } else {
+                    userEntities.comparePassword(req.body.password, data.user.password).then(function (pwdata) {
+                        if (!pwdata.isMatch) {
+                            reject({success: false, data: pwdata.data.toString()});
+                        } else {
+                            bcrypt.genSalt(encryptRounds, function (err, salt) { //generate a salt with rounds
+                                bcrypt.hash(req.body.newPassword, salt, function (err, hash) {
+                                    if (err) {
+                                        reject({success: false, data: err.toString()});
+                                    } else {
+                                        userEntities.updateUser({
+                                            password: hash,
+                                            username: req.user.username
+                                        }, req.user.id).then(function (data) {
+                                            resolve(data);
+                                        }).catch(function (err) {
+                                            reject(err);
+                                        });
+                                    }
+                                });
+                            });
+                        }
+                    }).catch(function (err) {
+                        reject({
+                            success: false,
+                            data: 'Original password is incorrect'
+                        });
+                    });
+                }
+            }).catch(function () {
+               reject({
+                   success: false,
+                   data: 'Something went wrong'
+               });
+            });
+        });
     }
 };

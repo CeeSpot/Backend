@@ -12,4 +12,5 @@ module.exports = function (app) {
     app.route('/api/users/profile/:userId').get(userController.profile);
     app.route('/api/users/me').get(auth.verifyToken, userController.me);
     app.route('/api/users/updateme').put(auth.verifyToken, userController.updateMe);
+    app.route('/api/users/changepassword').put(auth.verifyToken, userController.changePassword);
 };

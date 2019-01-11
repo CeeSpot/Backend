@@ -17,7 +17,6 @@ function getUserByUsername(username, toRemove = null) {
             if (err) reject({userFound: null, data: "Failed to authenticate user"});
 
             if (typeof results === 'undefined' || results.length === 0) {
-                // console.log("results: " + JSON.str);
                 resolve({userFound: false, data: "Username and password do not match"});
             } else {
                 let user = !toRemove ? entities.getJsonObjectFromDatabaseObject(results[0]) : entities.getJsonObjectFromDatabaseObject(results[0], toRemove);
@@ -41,10 +40,10 @@ function updateUser(data, id) {
     let self = this;
     return new Promise(function (resolve, reject) {
         config.con.query("UPDATE users SET ? where id = ?", [data, id], function (err, res) {
-            if (err) reject({success: false, data: err.toString()})
+            if (err) reject({success: false, data: err.toString()});
             self.getUserByUsername(data.username, {password: true}).then(userData => {
-                resolve({success: true, data: entities.signToken(userData.user)})
-            })
+                resolve({success: true, token: entities.signToken(userData.user)})
+            });
         });
     });
 }
@@ -60,7 +59,7 @@ function comparePassword(candidatePassword, hash) {
         bcrypt.compare(candidatePassword, hash, function (err, isMatch) {
             if (err) reject({userFound: null, data: err.toString()});
             if (!isMatch) {
-                resolve({isMatch: false, data: "Username and password do not match"});
+                resolve({isMatch: false, data: "Password is not correct"});
             } else {
                 resolve({isMatch: true});
             }
