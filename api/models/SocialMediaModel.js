@@ -7,7 +7,7 @@ module.exports = {
     getSites: function () {
         return new Promise(function (resolve, reject) {
             con.query("SELECT * FROM social_media", function (err, res) {
-                if (err) reject({success: false, data: "Something went wrong"})
+                if (err) reject({success: false, data: []});
                 else resolve({success: true, data: res});
             })
         });

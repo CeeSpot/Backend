@@ -10,7 +10,7 @@ function getResourceSocialMediaSites(resourceId, type, excluded = {}) {
                                  INNER JOIN social_media as sm ON smr.social_media_id = sm.id
                           WHERE smr.resource_id = ?
                             AND smr.type = ?`, [resourceId, type], function (err, res) {
-            if (err) reject({success: false, data: "Something went wrong"});
+            if (err) resolve([]);
             else resolve(res)
         });
     });

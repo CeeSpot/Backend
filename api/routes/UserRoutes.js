@@ -13,4 +13,6 @@ module.exports = function (app) {
     app.route('/api/users/me').get(auth.verifyToken, userController.me);
     app.route('/api/users/updateme').put(auth.verifyToken, userController.updateMe);
     app.route('/api/users/changepassword').put(auth.verifyToken, userController.changePassword);
+    app.route('/api/users/companies').post(auth.verifyToken, userController.addUserCompany);
+    app.route('/api/users/tags').post(auth.verifyToken, userController.addTags);
 };
