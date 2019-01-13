@@ -18,5 +18,56 @@ module.exports = {
                 }
             })
         });
+    },
+    getBlogsTags: function (req) {
+        return new Promise(function (resolve, reject) {
+            con.query(`SELECT * FROM blogs_tags`, function (err, res) {
+                if (err) {
+                    reject({
+                        success: false,
+                        data: "Failed to get blogs tags"
+                    })
+                } else {
+                    resolve({
+                        success: true,
+                        data: res
+                    });
+                }
+            })
+        });
+    },
+    getBlogTags: function (req) {
+        return new Promise(function (resolve, reject) {
+            con.query(`SELECT BT.id, BT.blog_id, BT.blogs_tags_id, T.description FROM blog_tags AS BT LEFT JOIN blogs_tags T ON T.id = BT.blog_id`, function (err, res) {
+                if (err) {
+                    reject({
+                        success: false,
+                        data: "Failed to get blogs tags"
+                    })
+                } else {
+                    resolve({
+                        success: true,
+                        data: res
+                    });
+                }
+            })
+        });
+    },
+    getBlog: function (req) {
+        return new Promise(function (resolve, reject) {
+            con.query(`SELECT * FROM blogs WHERE id = ?`, [req.params.blog_id], function (err, res) {
+                if (err) {
+                    reject({
+                        success: false,
+                        data: "Failed to get blog"
+                    })
+                } else {
+                    resolve({
+                        success: true,
+                        data: res
+                    });
+                }
+            })
+        });
     }
 };
