@@ -69,5 +69,48 @@ module.exports = {
                 }
             })
         });
-    }
+    },
+    addBlog: function (req) {
+        return new Promise(function (resolve, reject) {
+            con.query("INSERT INTO blogs SET ?", {
+                title: req.body.title,
+                description: req.body.description,
+                body: req.body.body
+            }, function (err, res) {
+                if (err) {
+                    reject({
+                        success: false,
+                        data: "Failed to make blog"
+                    })
+                } else {
+                    resolve({
+                        success: true,
+                        data: "Successfully created blog."
+                    });
+                }
+            })
+        })
+    },
+    updateBlog: function (req) {
+        return new Promise(function (resolve, reject) {
+            con.query(`UPDATE blogs SET title = ?, description = ?, body = ? WHERE id = ?`, [
+                req.body.title,
+                req.body.description,
+                req.body.body,
+                req.body.id
+            ], function (err, res) {
+                if (err) {
+                    reject({
+                        success: false,
+                        data: "Failed to update blog."
+                    })
+                } else {
+                    resolve({
+                        success: true,
+                        data: "Successfully updated blog."
+                    });
+                }
+            })
+        })
+    },
 };

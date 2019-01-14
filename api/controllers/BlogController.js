@@ -54,5 +54,21 @@ exports.getBlog = function (req, res) {
     });
 };
 
+exports.addBlog = function (req, res) {
+    blogModel.addBlog(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
+
+exports.updateBlog = function (req, res) {
+    blogModel.updateBlog(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
+
 
 
