@@ -27,7 +27,6 @@ exports.getUsers = function (req, res) {
 };
 
 exports.registerUser = function (req, res) {
-    console.log("kasdiajsn");
     userModel.registerUser(req).then(function (data) {
         res.send(data);
     }).catch(function (err) {
@@ -67,8 +66,24 @@ exports.updateMe = function (req, res) {
     });
 };
 
+exports.deleteUser = function (req,res) {
+    userModel.deleteUser(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
+
 exports.changePassword = function (req, res) {
     userModel.changePassword(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
+
+exports.updateUser = function (req,res) {
+    userModel.updateUser(req).then(function (data) {
         res.send(data);
     }).catch(function (err) {
         res.send(err);
