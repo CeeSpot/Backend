@@ -3,7 +3,6 @@
  */
 let jwt = require('jsonwebtoken');
 let config = require('../../config');
-let Enums = require('../../Enums');
 
 /**
  * Create a json object from a database user and exlucde colums in the exluded object

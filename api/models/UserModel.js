@@ -7,6 +7,7 @@ let enums = require('../Enums');
 let SocialMediaModel = require('./SocialMediaModel');
 let SocialMediaEntities = require('./Entities/SocialMediaEntities');
 
+let encryptRounds = 10;
 module.exports = {
     getUsers: function () {
         return new Promise(function (resolve, reject) {
@@ -27,9 +28,26 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             config.con.query("SELECT u.id AS user_id, t.* FROM tags t LEFT JOIN user_tags ut ON ut.tag_id=t.id LEFT JOIN users u ON u.id=ut.user_id", function (err, res) {
                 if (err) {
-                    reject({
+                    resolve({
                         success: false,
-                        data: "Failed getting user tags"
+                        data: []
+                    });
+                } else {
+                    resolve({
+                        success: true,
+                        data: res
+                    });
+                }
+            })
+        })
+    },
+    getUserTagsById: function(id) {
+        return new Promise((resolve, rejected) => {
+            config.con.query("SELECT ut.id, ut.tag_id, t.description FROM tags t LEFT JOIN user_tags ut ON ut.tag_id=t.id LEFT JOIN users u ON u.id=ut.user_id WHERE u.id = ?", [id], function (err, res) {
+                if (err) {
+                    resolve({
+                        success: false,
+                        data: []
                     });
                 } else {
                     resolve({
@@ -51,7 +69,7 @@ module.exports = {
                 if (results.length > 0) {
                     reject({success: false, data: "Username already exists"}); // User exists
                 } else {
-                    bcrypt.genSalt(10, function (err, salt) {
+                    bcrypt.genSalt(encryptRounds, function (err, salt) {
                         bcrypt.hash(req.body.password, salt, function (err, hash) {
                             if (err) {
                                 reject({success: false, data: err.toString()});
@@ -187,15 +205,19 @@ module.exports = {
         });
     },
     me: function (req) {
+        let self = this;
         return new Promise(function (resolve, reject) {
-            config.con.query(`SELECT companies.id, companies.name, companies.description 
+            config.con.query(`SELECT user_companies.id, user_companies.company_id, companies.name, companies.description, user_companies.role
                                FROM user_companies 
                                INNER JOIN companies ON user_companies.company_id = companies.id 
                                WHERE user_companies.user_id = ?`, req.user.id, function (err, res) {
-                if (err) reject({success: false, user: "Something went wrong"});
+                if (err) {
+                    console.log(err.toString());
+                    reject({success: false, user: "Something went wrong"});
+                }
+                req.user.companies = [];
                 if (res.length > 0) {
                     // Might have more than one company associated, thus return all of them
-                    req.user.companies = [];
                     res.forEach(function (i) {
                         req.user.companies.push(entities.getJsonObjectFromDatabaseObject(i));
                     });
@@ -204,33 +226,26 @@ module.exports = {
                     req.user.social_media_sites = data;
 
                     SocialMediaModel.getSites().then((socialMediaSites) => {
-                        resolve({
-                            success: true,
-                            user: req.user,
-                            sites: socialMediaSites.data,
-                            type: enums.socialMediaRoles.SOCIAL_MEDIA_USER
-                        });
-                    }).catch((err) => {
-                        resolve({
-                            success: true,
-                            user: req.user
-                        });
-                    })
-                })
+                        self.getUserTagsById(req.user.id).then((userTags) => {
+                            req.user.tags = userTags.data;
+                            resolve({
+                                success: true,
+                                user: req.user,
+                                sites: socialMediaSites.data,
+                                type: enums.socialMediaRoles.SOCIAL_MEDIA_USER
+                            });
+                        })
+                    });
+                });
             });
         });
     },
-    // updateMe: function (req) {
-    //     return new Promise(function (resolve, reject) {
-    //
-    //     });
-    // }
-    updateMe: function(req) {
+    updateMe: function (req) {
         return new Promise(function (resolve, reject) {
             if (req.user.username !== req.body.user.username) {
                 userEntities.getUserByUsername(req.body.user.username).then((resp) => {
                     if (!resp.success) reject(resp);
-                    userEntities.updateUser(req.body.user, req.user.id).then((resp) =>{
+                    userEntities.updateUser(req.body.user, req.user.id).then((resp) => {
                         resolve(resp);
                     }).catch((err) => {
                         reject(err)
@@ -239,7 +254,7 @@ module.exports = {
                     reject({success: false, data: "Username already exists"});
                 })
             } else {
-                userEntities.updateUser(req.body.user, req.user.id).then((resp) =>{
+                userEntities.updateUser(req.body.user, req.user.id).then((resp) => {
                     resolve(resp);
                 }).catch((err) => {
                     reject(err)
@@ -285,6 +300,73 @@ module.exports = {
                     });
                 }
             });
+        })},
+    changePassword: function (req) {
+        return new Promise(function (resolve, reject) {
+            userEntities.getUserByUsername(req.user.username).then(function (data) {
+                if (!data.userFound) {
+                    reject({success: false, data: data.data.toString()}); // no user found, should probably logout?
+                } else {
+                    userEntities.comparePassword(req.body.password, data.user.password).then(function (pwdata) {
+                        if (!pwdata.isMatch) {
+                            reject({success: false, data: pwdata.data.toString()});
+                        } else {
+                            bcrypt.genSalt(encryptRounds, function (err, salt) { //generate a salt with rounds
+                                bcrypt.hash(req.body.newPassword, salt, function (err, hash) {
+                                    if (err) {
+                                        reject({success: false, data: err.toString()});
+                                    } else {
+                                        userEntities.updateUser({
+                                            password: hash,
+                                            username: req.user.username
+                                        }, req.user.id).then(function (data) {
+                                            resolve(data);
+                                        }).catch(function (err) {
+                                            reject(err);
+                                        });
+                                    }
+                                });
+                            });
+                        }
+                    }).catch(function (err) {
+                        reject({
+                            success: false,
+                            data: 'Original password is incorrect'
+                        });
+                    });
+                }
+            }).catch(function () {
+                reject({
+                    success: false,
+                    data: 'Something went wrong'
+                });
+            });
         });
+    },
+    addUserCompany: function (req) {
+        return new Promise((resolve, reject) => {
+            userEntities.insertAndUpdateUserRoles(req.user, req.body).then((data) => {
+                userEntities.deleteUserRoles(req.body).then((data) => {
+                    resolve({success:false, data: 'Successfully updated the company roles of your user account'})
+                }).catch((err) => {
+                    resolve({success:false, data: 'Successfully updated the company roles of your user account'})
+                })
+            }).catch((err) => {
+                userEntities.deleteUserRoles(req.body).then((data) => {
+                    resolve({success:false, data: 'Successfully updated the company roles of your user account'})
+                }).catch((err) => {
+                    resolve({success:false, data: 'Successfully updated the company roles of your user account'})
+                })
+            })
+        })
+    },
+    addTags: function(req) {
+        return new Promise((resolve, reject) => {
+            userEntities.insertUserTags(req.user, req.body).then((data) => {
+                userEntities.deletedUserTags(req.user, req.body).then((data) => {
+                    resolve({success:false, data: 'Successfully updated your user account'})
+                })
+            });
+        })
     }
 };

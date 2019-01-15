@@ -14,4 +14,7 @@ module.exports = function (app) {
     app.route('/api/users/delete').delete(userController.deleteUser);
     app.route('/api/users/update').put(userController.updateUser);
     app.route('/api/users/updateme').put(auth.verifyToken, userController.updateMe);
+    app.route('/api/users/changepassword').put(auth.verifyToken, userController.changePassword);
+    app.route('/api/users/companies').post(auth.verifyToken, userController.addUserCompany);
+    app.route('/api/users/tags').post(auth.verifyToken, userController.addTags);
 };
