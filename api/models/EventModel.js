@@ -70,7 +70,6 @@ module.exports = {
 
             con.query("DELETE FROM user_events WHERE user_id = ? AND event_id = ?", [user_id, event_id], function (err, res) {
                 if (err) {
-                    console.log(err);
                     reject({
                         success: false,
                         data: "Failed to remove from the event"
@@ -107,9 +106,34 @@ module.exports = {
                 req.body.event_id
             ], function (err, res) {
                 if (err) {
-                    reject(err)
+                    reject({
+                        success: false,
+                        data: "Failed to remove from the event"
+                    })
                 } else {
-                    resolve(res);
+                    resolve({
+                        success: true,
+                        event_id: req.body.event_id
+                    });
+                }
+            })
+        })
+    },
+    deleteAllEventUsers: function (event_id) {
+        return new Promise(function (resolve, reject) {
+            con.query("DELETE FROM user_events WHERE event_id = ?", [
+                event_id
+            ], function (err, res) {
+                if (err) {
+                    reject({
+                        success: false,
+                        data: "Successfully deleted the event, failed to delete the users"
+                    })
+                } else {
+                    resolve({
+                        success: true,
+                        data: "Successfully deleted the event and it's users"
+                    });
                 }
             })
         })

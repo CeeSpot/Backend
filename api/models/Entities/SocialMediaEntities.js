@@ -46,7 +46,7 @@ function checkIfResourceSiteExists(socialMediaId, resourceId, type) {
  * @returns {boolean}
  */
 function socialMediaUrlMatches(site, urlToMatch) {
-    return urlToMatch.includes(site);
+    return typeof urlToMatch !== 'undefined' && typeof site !== 'undefined' && urlToMatch.includes(site);
 }
 
 /**
