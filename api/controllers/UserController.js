@@ -42,6 +42,7 @@ exports.authenticate = function (req, res) {
         res.send(err);
     });
 };
+
 exports.profile = function (req, res) {
     userModel.profile(req).then(function (data) {
         res.send(data);
@@ -49,6 +50,7 @@ exports.profile = function (req, res) {
         res.send(err);
     });
 };
+
 exports.me = function (req, res) {
     userModel.me(req).then(function (data) {
         res.send(data);
@@ -56,6 +58,7 @@ exports.me = function (req, res) {
         res.send(err);
     });
 };
+
 exports.updateMe = function (req, res) {
     userModel.updateMe(req).then(function (data) {
         res.send(data);
@@ -63,6 +66,7 @@ exports.updateMe = function (req, res) {
         res.send(err);
     });
 };
+
 exports.changePassword = function (req, res) {
     userModel.changePassword(req).then(function (data) {
         res.send(data);
@@ -70,6 +74,7 @@ exports.changePassword = function (req, res) {
         res.send(err);
     });
 };
+
 exports.addUserCompany = function (req, res) {
     userModel.addUserCompany(req).then(function (data) {
         res.send(data);
@@ -77,6 +82,7 @@ exports.addUserCompany = function (req, res) {
         res.send(err);
     });
 };
+
 exports.addTags = function (req, res) {
     userModel.addTags(req).then(function (data) {
         res.send(data);
