@@ -58,7 +58,16 @@ exports.addEvent = function (req, res) {
 
 exports.deleteEvent = function (req, res) {
     eventModel.deleteEvent(req).then(function (data) {
-        res.send(data);
+        console.log(data);
+        if (data.success){
+            eventModel.deleteAllEventUsers(data.event_id).then(function (data) {
+                console.log(data);
+                res.send(data);
+            }).catch(function (err) {
+                console.log(err);
+                res.send(err);
+            });
+        }
     }).catch(function (err) {
         res.send(err);
     });

@@ -66,3 +66,18 @@ exports.updateMe = function (req,res) {
         res.send(err);
     });
 };
+exports.deleteUser = function (req,res) {
+    userModel.deleteUser(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
+
+exports.updateUser = function (req,res) {
+    userModel.updateUser(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};

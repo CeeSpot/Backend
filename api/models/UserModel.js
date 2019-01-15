@@ -246,5 +246,45 @@ module.exports = {
                 });
             }
         })
+    },
+    deleteUser: function (req) {
+        return new Promise(function (resolve, reject) {
+            let user_id = req.body.user_id;
+            con.query("DELETE FROM users WHERE id = ?", [user_id], function (err, res) {
+                if (err) {
+                    console.log(err);
+                    reject({
+                        success: false,
+                        data: "Failed to delete user"
+                    })
+                } else {
+                    console.log(res);
+                    resolve({
+                        success: true,
+                        data: "Successfully deleted user"
+                    });
+                }
+            })
+        })
+    },
+    updateUser: function (req) {
+        return new Promise(function (resolve, reject) {
+            con.query("UPDATE users SET ? where id = ?", [req.body.data, req.body.data.id], function (err, res) {
+                if (err) {
+                    console.log(err);
+                    reject({
+                        success: false,
+                        data: "Failed to update user"
+                    });
+                }
+                else {
+                    console.log(res);
+                    resolve({
+                        success: true,
+                        data: "Successfully updated user"
+                    });
+                }
+            });
+        });
     }
 };
