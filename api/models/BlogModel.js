@@ -113,4 +113,23 @@ module.exports = {
             })
         })
     },
+    deleteBlog: function (req) {
+        return new Promise(function (resolve, reject) {
+            con.query("DELETE FROM blogs WHERE id = ?", [
+                req.body.blog_id
+            ], function (err, res) {
+                if (err) {
+                    reject({
+                        success: false,
+                        data: "Failed to delete blog."
+                    })
+                } else {
+                    resolve({
+                        success: true,
+                        data: "Successfully deleted blog."
+                    });
+                }
+            })
+        })
+    }
 };

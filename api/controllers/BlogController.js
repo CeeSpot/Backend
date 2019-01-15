@@ -70,5 +70,13 @@ exports.updateBlog = function (req, res) {
     });
 };
 
+exports.deleteBlog = function (req, res) {
+    blogModel.deleteBlog(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
+
 
 
