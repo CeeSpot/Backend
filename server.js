@@ -4,7 +4,7 @@ var app = express();
 var port = process.env.PORT || 3000;
 var bodyParser = require('body-parser');
 
-app.use(cors());
+app.use(cors({credentials: true, origin: true}));
 
 app.listen(port);
 
@@ -29,20 +29,12 @@ app.use(function (req, res, next) {
     next();
 });
 
-var users = require('./api/routes/UserRoutes'); //importing route
-var companies = require('./api/routes/CompanyRoutes'); //importing route
-var tags = require('./api/routes/TagRoutes'); //importing route
-var events = require('./api/routes/EventRoutes'); //importing route
-var socialMedia = require('./api/routes/SocialMediaRoutes'); //importing route
-var blogs = require('./api/routes/BlogRoutes'); //importing route
-
-// app.set('etag', false);
-//
-// app.use(function (req, res, next) {
-//     res.header('Cache-Control', 'private, no-cache, must-revalidate, private');
-//     // res.json(res.JSONResponse);\
-//     next()
-// });
+let users = require('./api/routes/UserRoutes'); //importing route
+let companies = require('./api/routes/CompanyRoutes'); //importing route
+let events = require('./api/routes/EventRoutes'); //importing route
+let tags = require('./api/routes/TagRoutes'); //importing route
+let socialMedia = require('./api/routes/SocialMediaRoutes'); //importing route
+let blogs = require('./api/routes/BlogRoutes'); //importing route
 
 users(app); //register the route
 companies(app); //register the route
