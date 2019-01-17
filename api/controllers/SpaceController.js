@@ -66,7 +66,6 @@ exports.addRequest = function (req, res) {
 
 exports.getAvailable = function (req, res) {
     spaceModel.getAvailable(req).then(function (data) {
-
         if (checkAvailability(data.data, req.body.data)){
             spaceModel.addBooking(req).then(function (data) {
                 res.send(data);
@@ -92,6 +91,13 @@ exports.getSpaceRequests = function (req, res) {
     });
 };
 
+exports.appDecReservation = function (req, res) {
+    spaceModel.appDecReservation(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
 
 /** Helpers */
 function checkAvailability(reservations, booking){

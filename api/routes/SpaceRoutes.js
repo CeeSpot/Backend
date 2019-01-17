@@ -9,5 +9,6 @@ module.exports = function (app) {
     app.route('/api/spaces/request').post(spaceController.addRequest);
     app.route('/api/spaces/add').post(spaceController.addSpace);
     app.route('/api/spaces/availability').post(spaceController.getAvailable);
-    app.route('/api/spaces/getrequests').get(spaceController.getSpaceRequests);
+    app.route('/api/requests/spaces/getrequests').get(spaceController.getSpaceRequests);
+    app.route('/api/requests/spaces/appdec').put(spaceController.appDecReservation);
 };

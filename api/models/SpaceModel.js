@@ -173,4 +173,22 @@ module.exports = {
             })
         });
     }
+    ,
+    appDecReservation: function(req, space_id){
+        return new Promise(function (resolve, reject) {
+            con.query("UPDATE space_reservations SET approved = ? where id = ?", [req.body.data.approved, req.body.data.id], function (err, res) {
+                if (err) {
+                    reject({
+                        success: false,
+                        data: "Failed to get spaces"
+                    })
+                } else {
+                    resolve({
+                        success: true,
+                        data: res
+                    });
+                }
+            })
+        });
+    }
 };
