@@ -93,6 +93,7 @@ exports.getSpaceRequests = function (req, res) {
 
 exports.appDecReservation = function (req, res) {
     spaceModel.appDecReservation(req).then(function (data) {
+        mailRequestFollowUp(req.body.data);
         res.send(data);
     }).catch(function (err) {
         res.send(err);
@@ -122,4 +123,34 @@ function checkAvailability(reservations, booking){
     });
 
     return available;
+}
+
+function mailRequestFollowUp(request){
+    var nodemailer = require('nodemailer');
+
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'ceespottest@gmail.com',
+            pass: 'theCTest1!'
+        }
+    });
+
+    var subject = "Reserveringsverzoek " + request.space_title;
+    var msg = "Uw reservering is goedgekeurd. Voor verdere vragen kunt u contact opnemen met Bart-Jannnnnn";
+
+    var mailOptions = {
+        from: 'ceespottest@gmail.com',
+        to: 'ceespottest@gmail.com',
+        subject: subject,
+        text: msg
+    };
+
+    transporter.sendMail(mailOptions, function(error, info){
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
 }
