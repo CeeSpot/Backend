@@ -38,7 +38,7 @@ module.exports = {
     },
     getBlogTags: function (req) {
         return new Promise(function (resolve, reject) {
-            con.query(`SELECT BT.id, BT.blog_id, BT.blogs_tags_id, T.description FROM blog_tags AS BT LEFT JOIN blogs_tags T ON T.id = BT.blog_id`, function (err, res) {
+            con.query(`SELECT BT.blogs_tags_id AS id, BT.blog_id, T.description FROM blog_tags AS BT LEFT JOIN blogs_tags T ON T.id = BT.blogs_tags_id`, function (err, res) {
                 if (err) {
                     reject({
                         success: false,
@@ -83,16 +83,32 @@ module.exports = {
                         data: "Failed to make blog"
                     })
                 } else {
-                    resolve({
-                        success: true,
-                        data: "Successfully created blog."
-                    });
+                    var tags = req.body.tags;
+                    var insertId = res.insertId;
+                    var success = true;
+                    tags.forEach(tag => {
+                        con.query("INSERT INTO blog_tags SET ?", {
+                        blog_id: insertId,
+                        blogs_tags_id: tag.id
+                    }, function (err, res) {
+                        if(err){
+                            success = false;
+                        }
+                    })
+                    })
+                    if(success) {
+                        resolve({
+                            success: true,
+                            data: "Successfully created blog."
+                        });
+                    }
                 }
             })
         })
     },
     updateBlog: function (req) {
         return new Promise(function (resolve, reject) {
+            var tags = req.body.tags;
             con.query(`UPDATE blogs SET title = ?, description = ?, body = ? WHERE id = ?`, [
                 req.body.title,
                 req.body.description,
@@ -105,10 +121,34 @@ module.exports = {
                         data: "Failed to update blog."
                     })
                 } else {
-                    resolve({
-                        success: true,
-                        data: "Successfully updated blog."
-                    });
+                    con.query(`DELETE FROM blog_tags WHERE blog_id = ?`, [
+                        req.body.id
+                    ], function (err, res) {
+                        if (err) {
+                            reject({
+                                success: false,
+                                data: "Failed to update blog."
+                            })
+                        } else {
+                            var success = true;
+                                tags.forEach(tag => {
+                                    con.query("INSERT INTO blog_tags SET ?", {
+                                    blog_id: req.body.id,
+                                    blogs_tags_id: tag.id
+                                }, function (err, res) {
+                                    if(err) {
+                                        success = false;
+                                    }
+                                })
+                            })
+                            if(success) {
+                                resolve({
+                                    success: true,
+                                    data: "Successfully updated blog."
+                                });
+                            }
+                        }
+                    })
                 }
             })
         })
