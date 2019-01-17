@@ -3,6 +3,7 @@ let config = require('../config');
 let Enums = require('../Enums');
 let Entities = require('./Entities/Entities');
 let SocialMediaEntities = require("./Entities/SocialMediaEntities");
+let UserEntities = require("./Entities/UserEntities");
 module.exports = {
     getSites: function () {
         return new Promise(function (resolve, reject) {
@@ -38,6 +39,7 @@ module.exports = {
                 let sites = req.body.sites;
                 let smrs = req.body.social_media_resource_sites;
                 let resource_id = req.body.resource_id;
+                let ownSite = req.body.website;
 
                 let errors = {};
                 let insertedRecords = 0;
@@ -52,11 +54,15 @@ module.exports = {
                             errors.update = updatedData.errors;
                             updatedRecords += updatedData.updatedRecords;
                         }
-                        resolve({
-                            success:true,
-                            errors : errors,
-                            insertedRecords : insertedRecords,
-                            updatedRecords: updatedRecords
+
+                        UserEntities.updateWebsite(resource_id, req.user.username, ownSite).then((updatedSite) => {
+                            resolve({
+                                success:true,
+                                errors : errors,
+                                insertedRecords : insertedRecords,
+                                updatedRecords: updatedRecords,
+                                token: updatedSite.token
+                            })
                         })
                     })
                 })

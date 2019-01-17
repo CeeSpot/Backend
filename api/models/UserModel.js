@@ -59,7 +59,6 @@ module.exports = {
         })
     },
     registerUser: function (req) {
-        console.log("kasdiajsasdsan");
         return new Promise(function (resolve, reject) {
             let username = req.body.username;
             config.con.query("SELECT username from users WHERE username = ? ORDER BY username LIMIT 1", [username], function (err, results, fields) {
@@ -215,6 +214,8 @@ module.exports = {
                     console.log(err.toString());
                     reject({success: false, user: "Something went wrong"});
                 }
+                req.user.mailVis = req.user.mailVis === 1;
+
                 req.user.companies = [];
                 if (res.length > 0) {
                     // Might have more than one company associated, thus return all of them
