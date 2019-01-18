@@ -8,7 +8,6 @@ const fs = require('fs');
 const http = require('http');
 const https = require('https');
 
-app.use(express.static('static'));
 
 
 // Certificate
@@ -36,10 +35,12 @@ if (false) {
     console.log('HTTPS Server running on port 443');
   });
 } else {
+  console.log("Aight");
   app.use(cors());
   app.listen(port);
 }
 
+app.use(express.static('static'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
