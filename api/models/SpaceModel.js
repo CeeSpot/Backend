@@ -37,9 +37,14 @@ module.exports = {
         });
     },
     updateSpace: function (req) {
+        // Clone object and delete reservations (not a column in db)
+        let clone = req.body.data;
+        delete clone.reservations;
+
         return new Promise(function (resolve, reject) {
-            con.query("UPDATE spaces SET ? where id = ?", [req.body.data, req.body.data.id], function (err, res) {
+            con.query("UPDATE spaces SET ? where id = ?", [clone, clone.id], function (err, res) {
                 if (err) {
+                    console.log(err);
                     reject({
                         success: false,
                         data: "Failed to update space"
