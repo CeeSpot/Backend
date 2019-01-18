@@ -21,7 +21,6 @@ module.exports = {
     },
     toggleBlogActive: function (req) {
         return new Promise(function (resolve, reject) {
-            console.log(req.body.is_on);
             con.query(`UPDATE settings SET is_on = ? WHERE name = 'Blogs'`, [
                 req.body.is_on
             ], function (err, res) {
