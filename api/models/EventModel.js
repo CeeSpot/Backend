@@ -1,10 +1,11 @@
 'use strict';
 var config = require('../config');
+var moment = require('moment');
 
 module.exports = {
     getEvents: function () {
             return new Promise(function (resolve, reject) {
-                con.query("SELECT * FROM events", function (err, res) {
+                con.query("SELECT * FROM events ORDER BY start ASC", function (err, res) {
                     if (err) {
                         reject({
                             success:false,
@@ -19,7 +20,26 @@ module.exports = {
                 })
             });
     },
-    getUserEvents: function (user) {
+    getUpcomingEvents: function () {
+        let today = moment().startOf('day').format('YYYY-MM-DD HH:mm:ss');
+
+        return new Promise(function (resolve, reject) {
+            con.query("SELECT * FROM events WHERE start > ? ORDER BY start ASC LIMIT 3", [today], function (err, res) {
+                if (err) {
+                    console.log(err)
+                    reject({
+                        success:false,
+                        data: "Failed to get events."
+                    })
+                } else {
+                    resolve({
+                        success: true,
+                        data: res
+                    });
+                }
+            })
+        });
+    },getUserEvents: function (user) {
         return new Promise(function (resolve, reject) {
             con.query("SELECT * FROM user_events WHERE user_id = ?", [user.id], function (err, res) {
                 if (err) {
@@ -86,12 +106,7 @@ module.exports = {
     },
     addEvent: function (req) {
         return new Promise(function (resolve, reject) {
-            con.query("INSERT INTO events SET ?", {
-                title: req.body.title,
-                description: req.body.description,
-                start: req.body.start,
-                end: req.body.end
-            }, function (err, res) {
+            con.query("INSERT INTO events SET ?", [req.body], function (err, res) {
                 if (err) {
                     reject(err)
                 } else {
@@ -139,22 +154,12 @@ module.exports = {
         })
     },
     updateEvent: function (req) {
+        // Clone object and delete participants (not a column in db)
+        let clone = req.body;
+        delete clone.participants;
+
         return new Promise(function (resolve, reject) {
-            con.query(`UPDATE events SET title = ?, description = ?, start = ?, end = ?,
-                small_description = ?, location_name = ?, location_street = ?, location_postalcode = ?,
-                 location_number = ?, location_city = ? WHERE id = ?`, [
-                req.body.title,
-                req.body.description,
-                req.body.start,
-                req.body.end,
-                req.body.small_description,
-                req.body.location_name,
-                req.body.location_street,
-                req.body.location_postalcode,
-                req.body.location_number,
-                req.body.location_city,
-                req.body.id
-            ], function (err, res) {
+            con.query(`UPDATE events SET ? where id = ?`, [clone, clone.id], function (err, res) {
                 if (err) {
                     reject({
                         success: false,
