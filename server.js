@@ -52,6 +52,7 @@ let socialMedia = require('./api/routes/SocialMediaRoutes'); //importing route
 let blogs = require('./api/routes/BlogRoutes'); //importing route
 let fileUpload = require('./api/routes/FileUploadRoutes');
 let spaces = require('./api/routes/SpaceRoutes'); //importing route
+let admin = require('./api/routes/AdminRoutes'); //importing route
 
 users(app); //register the route
 companies(app); //register the route
@@ -60,6 +61,7 @@ events(app); //register the route
 socialMedia(app); //register the route
 blogs(app); //register the route
 spaces(app); //register the route
-fileUpload(app);
+fileUpload(app); //register the route
+admin(app); //register the route
 
 console.log('the cee spot RESTful API server started on: ' + port);

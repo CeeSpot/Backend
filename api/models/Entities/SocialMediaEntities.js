@@ -7,7 +7,7 @@ function getResourceSocialMediaSites(resourceId, type, excluded = {}) {
     return new Promise((resolve, reject) => {
         config.con.query(`SELECT smr.social_media_id, smr.resource_id, smr.url, sm.site
                           from social_media_resources as smr
-                                 INNER JOIN social_media as sm ON smr.social_media_id = sm.id
+                            INNER JOIN social_media as sm ON smr.social_media_id = sm.id
                           WHERE smr.resource_id = ?
                             AND smr.type = ?`, [resourceId, type], function (err, res) {
             if (err) resolve([]);
@@ -24,6 +24,7 @@ function getResourceSocialMediaSites(resourceId, type, excluded = {}) {
  */
 function checkIfResourceSiteExists(socialMediaId, resourceId, type) {
     return new Promise((resolve, reject) => {
+        console.log(socialMediaId,resourceId,type);
         config.con.query(`SELECT resource_id
                           FROM social_media_resources
                           WHERE resource_id = ?
@@ -46,7 +47,7 @@ function checkIfResourceSiteExists(socialMediaId, resourceId, type) {
  * @returns {boolean}
  */
 function socialMediaUrlMatches(site, urlToMatch) {
-    return typeof urlToMatch !== 'undefined' && typeof site !== 'undefined' && urlToMatch.includes(site);
+    return typeof urlToMatch !== 'undefined' && typeof site !== 'undefined';
 }
 
 /**
@@ -59,42 +60,50 @@ function socialMediaUrlMatches(site, urlToMatch) {
  */
 function insertResourceRecord(resourceId, type, record) {
     return new Promise((resolve, reject) => {
-        checkIfResourceSiteExists(record.id, resourceId, type).then((data) => {
-            if (data === false) {
-                config.con.query("SELECT site FROM social_media WHERE id = ?", [record.id], function (err, res) {
-                    // Check if there is an error
-                    if (err) reject({success: false, data: "Something went wrong with inserting the site"});
-                    else {
-
-                        // Check if there is any data
-                        if (res.length === 0) reject({success: false, data: "Site doesn't exist"});
+        console.log(record);
+        console.log(record.url.length);
+        if (record.url.length > 0) {
+            checkIfResourceSiteExists(record.id, resourceId, type).then((data) => {
+                if (data === false) {
+                    config.con.query("SELECT site FROM social_media WHERE id = ?", [record.id], function (err, res) {
+                        // Check if there is an error
+                        if (err) reject({success: false, data: "Something went wrong with inserting the site"});
                         else {
-                            let post = {
-                                social_media_id: record.id,
-                                resource_id: resourceId,
-                                type: type,
-                                url: record.url
-                            };
+                            // Check if there is any data
+                            if (res.length === 0) reject({success: false, data: "Site doesn't exist"});
+                            else {
+                                let post = {
+                                    social_media_id: record.id,
+                                    resource_id: resourceId,
+                                    type: type,
+                                    url: record.url
+                                };
 
-                            config.con.query("INSERT INTO social_media_resources SET ?", post, function (err, res) {
-                                if (err)  reject({ success: false,data: "Something went wrong with inserting the site" });
-                                else {
-                                    resolve({
-                                        success: true,
-                                        data: "Successfully added the social media link"
+                                config.con.query("INSERT INTO social_media_resources SET ?", post, function (err, res) {
+                                    if (err) reject({
+                                        success: false,
+                                        data: "Something went wrong with inserting the site"
                                     });
-                                }
-                            });
+                                    else {
+                                        resolve({
+                                            success: true,
+                                            data: "Successfully added the social media link"
+                                        });
+                                    }
+                                });
+                            }
                         }
-                    }
-                });
-            } else {
-                reject({
-                    success: false,
-                    data: "Social media site " + record.site + " has already been added to this profile"
-                });
-            }
-        }).catch((err) => reject({success: true, data: "Something went wrong"}))
+                    });
+                } else {
+                    reject({
+                        success: false,
+                        data: "Social media site " + record.site + " has already been added to this profile"
+                    });
+                }
+            }).catch((err) => reject({success: true, data: "Something went wrong"}))
+        }else{
+            resolve(deleteResourceRecord(record,type));
+        }
     })
 }
 
@@ -106,18 +115,41 @@ function insertResourceRecord(resourceId, type, record) {
  */
 function updateResourceRecord(record, type) {
     return new Promise((resolve, reject) => {
-        checkIfResourceSiteExists(record.social_media_id, record.resource_id, record.type).then((data) => {
-            if (data === false) {
-                config.con.query("UPDATE social_media_resources SET url = ? WHERE social_media_id = ? AND resource_id = ? AND type = ?",
-                    [record.url, record.social_media_id, record.resource_id, type],
+        if (record.url.length > 0) {
+            checkIfResourceSiteExists(record.social_media_id, record.resource_id, type).then((data) => {
+                if (data === true) {
+                    config.con.query("UPDATE social_media_resources SET url = ? WHERE social_media_id = ? AND resource_id = ? AND type = ?",
+                        [record.url, record.social_media_id, record.resource_id, type],
+                        function (err, res) {
+                            if (err) reject({success: false, data: "Failed to update URL for " + record.site});
+                            else resolve({success: true, data: "Successfully updated record"});
+                        });
+                } else {
+                    reject({success: false, data: "Can't update URL for " + record.site + ". Site doesn't exist"});
+                }
+            }).catch((err) => reject(err));
+        } else {
+            resolve(deleteResourceRecord(record,type));
+        }
+    });
+}
+function deleteResourceRecord(record, type) {
+    return new Promise((resolve,reject) => {
+        checkIfResourceSiteExists(record.social_media_id, record.resource_id,type).then((data) => {
+            if(data === true) {
+                config.con.query("DELETE FROM social_media_resources WHERE social_media_id = ? AND resource_id = ? AND type = ?",
+                    [record.social_media_id, record.resource_id, type],
                     function (err, res) {
-                        if (err) reject({success: false, data: "Failed to update URL for " + record.site});
-                        else resolve({success: true, data: "Successfully updated record"});
+                        if (err) {
+                            console.log(err.toString());
+                            reject({success: false, data: "Failed to remove URL for " + record.site});
+                        }
+                        else resolve({success: true, data: "Successfully removed record"});
                     });
-            } else {
-                reject({success: false, data: "Can't update URL for " + record.site + ". Site doesn't exist"});
             }
-        }).catch((err) => reject(err));
+        }).catch((err) => {
+            reject({success:false, data: "Something went wrong"})
+        });
     });
 }
 

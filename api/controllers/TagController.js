@@ -2,8 +2,16 @@
 
 var tagModel = require('../models/TagModel');
 
-exports.getTags = function (req, res) {
-    tagModel.getTags.then(function (data) {
+exports.getUserTags = function (req, res) {
+    tagModel.getUserTags().then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
+
+exports.getCompanyTags = function (req, res) {
+    tagModel.getCompanyTags().then(function (data) {
         res.send(data);
     }).catch(function (err) {
         res.send(err);

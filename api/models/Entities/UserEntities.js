@@ -38,14 +38,40 @@ function getUserByUsername(username, toRemove = null) {
  */
 function updateUser(data, id) {
     let self = this;
+    data.mailVis = data.mailVis ? 1 : 0;
+    delete data.social_media_sites;
+    delete data.tags;
+    delete data.isGuestUser;
+    delete data.isFellow;
+    delete data.isPartner;
+    delete data.isStandardUser;
+    delete data.isAdmin;
+    console.log(data);
     return new Promise(function (resolve, reject) {
         config.con.query("UPDATE users SET ? where id = ?", [data, id], function (err, res) {
-            if (err) reject({success: false, data: err.toString()});
+            if (err) {
+                console.log(err.toString());
+                reject({success: false, data: err.toString()});
+            }
             self.getUserByUsername(data.username, {password: true}).then(userData => {
                 resolve({success: true, token: entities.signToken(userData.user)})
             });
         });
     });
+}
+
+function updateWebsite(userId, username, website) {
+    return new Promise((resolve, reject) => {
+        config.con.query("UPDATE users SET website = ? WHERE id = ?", [website,userId], function(err, res) {
+            if (err){
+                resolve({success:false, data: "Failed to update site for user"})
+            }else{
+                getUserByUsername(username, {password: true}).then(userData => {
+                    resolve({success: true, token: entities.signToken(userData.user)})
+                });
+            }
+        })
+    })
 }
 
 /**
@@ -183,5 +209,6 @@ module.exports = {
     'insertAndUpdateUserRoles': insertAndUpdateUserRoles,
     'deleteUserRoles': deleteUserRoles,
     'insertUserTags': insertUserTags,
-    'deletedUserTags': deletedUserTags
+    'deletedUserTags': deletedUserTags,
+    'updateWebsite': updateWebsite
 };
