@@ -32,6 +32,14 @@ exports.getEvents = function (req, res) {
     });
 };
 
+exports.getUpcomingEvents = function (req, res) {
+    eventModel.getUpcomingEvents(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
+
 exports.addUserEvent = function (req, res) {
     eventModel.addUserEvent(req).then(function (data) {
         res.send(data);
