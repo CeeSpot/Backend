@@ -12,6 +12,14 @@ exports.getSettings = function (req, res) {
     });
 };
 
+exports.toggleBlogActive = function (req, res) {
+    adminModel.toggleBlogActive(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
+
 
 
 
