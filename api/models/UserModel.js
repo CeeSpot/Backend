@@ -174,6 +174,7 @@ module.exports = {
      * @returns {Promise}
      */
     profile: function (req) {
+        let self = this;
         return new Promise(function (resolve, reject) {
             let userid = req.param("userId");
             config.con.query("SELECT * FROM users WHERE id = ?", [userid], function (err, results) {
@@ -182,10 +183,10 @@ module.exports = {
                     reject({success: false, data: "No users found"});
                 } else {
                     let user = entities.getJsonObjectFromDatabaseObject(results[0], {password: true, username: true});
-                    config.con.query(`SELECT companies.id, companies.name, companies.description 
-                               FROM user_companies 
-                               INNER JOIN companies ON user_companies.company_id = companies.id 
-                               WHERE user_companies.user_id = ?`, userid, function (err, res) {
+                    config.con.query(`SELECT user_companies.id, user_companies.company_id, companies.name, companies.description, user_companies.role
+                                       FROM user_companies 
+                                       INNER JOIN companies ON user_companies.company_id = companies.id 
+                                       WHERE user_companies.user_id = ?`, userid, function (err, res) {
                         if (err) reject({success: false, data: err.toString()});
                         if (res.length > 0) {
                             // Might have more than one company associated, thus return all of them
@@ -194,10 +195,16 @@ module.exports = {
                                 user.companies.push(entities.getJsonObjectFromDatabaseObject(i));
                             });
                         }
-                        resolve({
-                            success: true,
-                            user: user
-                        });
+                        SocialMediaEntities.getResourceSocialMediaSites(userid, enums.socialMediaRoles.SOCIAL_MEDIA_USER).then((data) => {
+                            user.social_media_sites = data;
+                            self.getUserTagsById(userid).then((userTags) => {
+                                user.tags = userTags.data;
+                                resolve({
+                                    success: true,
+                                    user: user
+                                });
+                            })
+                        })
                     });
                 }
             });
