@@ -2,6 +2,7 @@
 
 var blogModel = require('../models/BlogModel');
 var auth = require('../Auth');
+var authorisationModel = require('../models/AuthorisationModel');
 
 
 exports.getBlogs = function (req, res) {

@@ -56,17 +56,13 @@ exports.addSpace = function (req, res) {
     });
 };
 
-exports.addRequest = function (req, res) {
-    spaceModel.addRequest(req).then(function (data) {
-        res.send(data);
-    }).catch(function (err) {
-        res.send(err);
-    });
-};
 
-exports.getAvailable = function (req, res) {
+exports.addBooking = function (req, res) {
+    console.log('came here')
     spaceModel.getAvailable(req).then(function (data) {
-        if (checkAvailability(data.data, req.body.data)){
+        console.log('came here2')
+        if (checkAvailability(data.data, req.body.reservation)){
+            console.log('came here3')
             spaceModel.addBooking(req).then(function (data) {
                 res.send(data);
             }).catch(function (err) {
@@ -74,6 +70,7 @@ exports.getAvailable = function (req, res) {
             });
         }
         else{
+            console.log('came here2.5')
             var msg = {data: {message: 'Room is already booked'}};
             res.send(msg);
         }
@@ -91,8 +88,8 @@ exports.getSpaceRequests = function (req, res) {
     });
 };
 
-exports.appDecReservation = function (req, res) {
-    spaceModel.appDecReservation(req).then(function (data) {
+exports.updateReservationState = function (req, res) {
+    spaceModel.updateReservationState(req).then(function (data) {
         mailRequestFollowUp(req.body.data);
         res.send(data);
     }).catch(function (err) {
