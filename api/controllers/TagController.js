@@ -1,6 +1,6 @@
 'use strict';
 
-var tagModel = require('../models/TagModel');
+let tagModel = require('../models/TagModel');
 
 exports.getUserTags = function (req, res) {
     tagModel.getUserTags().then(function (data) {

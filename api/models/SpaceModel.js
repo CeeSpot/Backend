@@ -138,15 +138,10 @@ module.exports = {
         });
     },
     addBooking: function (req) {
-        console.log('came here4')
         return new Promise(function (resolve, reject) {
-            console.log('came here5')
             authorisationModel.allowSpaceBookingNoConfirm(req.user).then((resp) => {
-                console.log('came here6')
-                console.log(resp)
                 req.body.reservation.approved = resp.noconfirm ? 1 : 0
                 con.query("INSERT INTO space_reservations SET ?", [req.body.reservation], function (err, res) {
-                    console.log('came here7')
                     if (err) {
                         reject({
                             success: false,
@@ -215,7 +210,7 @@ module.exports = {
     updateReservationState: function(req, space_id){
         return new Promise(function (resolve, reject) {
             if (req.user.isAdmin) {
-                con.query("UPDATE space_reservations SET approved = ? where id = ?", [req.body.reservation.approved, req.body.data.id], function (err, res) {
+                con.query("UPDATE space_reservations SET approved = ? where id = ?", [req.body.reservation.approved, req.body.reservation.id], function (err, res) {
                     if (err) {
                         reject({
                             success: false,
@@ -226,7 +221,7 @@ module.exports = {
                         resolve({
                             success: true,
                             data: res,
-                            authorised: false
+                            authorised: true
                         });
                     }
                 })

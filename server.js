@@ -1,8 +1,8 @@
-var express = require('express');
-var cors = require('cors');
-var app = express();
-var port = process.env.PORT || 3000;
-var bodyParser = require('body-parser');
+let express = require('express');
+let cors = require('cors');
+let app = express();
+let port = process.env.PORT || 3000;
+let bodyParser = require('body-parser');
 
 const fs = require('fs');
 const http = require('http');
@@ -35,7 +35,6 @@ if (false) {
     console.log('HTTPS Server running on port 443');
   });
 } else {
-  console.log("Aight");
   app.use(cors());
   app.listen(port);
 }

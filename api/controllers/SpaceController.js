@@ -1,7 +1,8 @@
 'use strict';
-var moment = require('moment');
+let moment = require('moment');
 
-var spaceModel = require('../models/SpaceModel');
+let spaceModel = require('../models/SpaceModel');
+let mailer = require('../Mailer');
 
 exports.getSpaces = function (req, res) {
     spaceModel.getSpaces(req).then(function (data) {
@@ -58,20 +59,21 @@ exports.addSpace = function (req, res) {
 
 
 exports.addBooking = function (req, res) {
-    console.log('came here')
     spaceModel.getAvailable(req).then(function (data) {
-        console.log('came here2')
         if (checkAvailability(data.data, req.body.reservation)){
-            console.log('came here3')
             spaceModel.addBooking(req).then(function (data) {
+                if (data.success){
+                    let body = `Nieuw reserveringsverzoek, check het adminpanel biatchhhh`;
+
+                    mailer.sendMail('ceespottest@gmail.com', 'Reserveringsverzoek', body);
+                }
                 res.send(data);
             }).catch(function (err) {
                 res.send(err);
             });
         }
         else{
-            console.log('came here2.5')
-            var msg = {data: {message: 'Room is already booked'}};
+            let msg = {data: {message: 'Room is already booked'}};
             res.send(msg);
         }
         //res.send(data);
@@ -90,7 +92,10 @@ exports.getSpaceRequests = function (req, res) {
 
 exports.updateReservationState = function (req, res) {
     spaceModel.updateReservationState(req).then(function (data) {
-        mailRequestFollowUp(req.body.data);
+        let subject = "Reserveringsverzoek " + req.body.reservation.space_title;
+        let mailto = req.body.reservation.email;
+        let body = `Beste ` + req.body.reservation.name + `,\nUw reservering voor de ` + req.body.reservation.space_title + `, op ` + moment(req.body.reservation.date).format('DD-MM-YYYY') + ` is goedgekeurd.`;
+        mailer.sendMail(mailto, subject, body);
         res.send(data);
     }).catch(function (err) {
         res.send(err);
@@ -99,14 +104,14 @@ exports.updateReservationState = function (req, res) {
 
 /** Helpers */
 function checkAvailability(reservations, booking){
-    var available = true;
+    let available = true;
 
-    var b_start = moment(booking.date + ' ' + booking.start, 'YYYY-MM-DD HH:mm');
-    var b_end = moment(booking.date + ' ' + booking.end, 'YYYY-MM-DD HH:mm');
+    let b_start = moment(booking.date + ' ' + booking.start, 'YYYY-MM-DD HH:mm');
+    let b_end = moment(booking.date + ' ' + booking.end, 'YYYY-MM-DD HH:mm');
 
     reservations.forEach(reservation => {
-        var r_start = moment(booking.date + ' ' + reservation.start, 'YYYY-MM-DD HH:mm:ss');
-        var r_end = moment(booking.date + ' ' + reservation.end, 'YYYY-MM-DD HH:mm:ss');
+        let r_start = moment(booking.date + ' ' + reservation.start, 'YYYY-MM-DD HH:mm:ss');
+        let r_end = moment(booking.date + ' ' + reservation.end, 'YYYY-MM-DD HH:mm:ss');
 
         if (r_start <= b_start && r_end > b_start){
             available = false;
@@ -120,34 +125,4 @@ function checkAvailability(reservations, booking){
     });
 
     return available;
-}
-
-function mailRequestFollowUp(request){
-    var nodemailer = require('nodemailer');
-
-    var transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: 'ceespottest@gmail.com',
-            pass: 'theCTest1!'
-        }
-    });
-
-    var subject = "Reserveringsverzoek " + request.space_title;
-    var msg = "Uw reservering is goedgekeurd. Voor verdere vragen kunt u contact opnemen met Bart-Jannnnnn";
-
-    var mailOptions = {
-        from: 'ceespottest@gmail.com',
-        to: 'ceespottest@gmail.com',
-        subject: subject,
-        text: msg
-    };
-
-    transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-            console.log(error);
-        } else {
-            console.log('Email sent: ' + info.response);
-        }
-    });
 }

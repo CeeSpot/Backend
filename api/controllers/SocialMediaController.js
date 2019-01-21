@@ -1,6 +1,6 @@
 'use strict';
 
-var socialMediaModel = require('../models/SocialMediaModel');
+let socialMediaModel = require('../models/SocialMediaModel');
 
 exports.getSites = function (req, res) {
     socialMediaModel.getSites().then(function (data) {

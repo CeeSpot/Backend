@@ -49,7 +49,6 @@ module.exports = {
                         data: "failed to get user event"
                     });
                 } else {
-                    // console.log(res);
                     resolve({
                         success: true,
                         data: res

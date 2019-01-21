@@ -1,5 +1,5 @@
 'use strict';
-var config = require('../config');
+let config = require('../config');
 let entities = require('./Entities/Entities');
 let enums = require('../Enums');
 let SocialMediaModel = require('./SocialMediaModel');

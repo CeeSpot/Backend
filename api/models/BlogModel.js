@@ -85,9 +85,9 @@ module.exports = {
                         authorised: true
                     })
                 } else {
-                    var tags = req.body.tags;
-                    var insertId = res.insertId;
-                    var success = true;
+                    let tags = req.body.tags;
+                    let insertId = res.insertId;
+                    let success = true;
 
                     if (tags !== undefined) {
                         tags.forEach(tag => {
@@ -123,7 +123,7 @@ module.exports = {
   updateBlog: function (req) {
     return new Promise(function (resolve, reject) {
         if(req.user.isAdmin) {
-            var tags = req.body.tags;
+            let tags = req.body.tags;
             con.query(`UPDATE blogs
                        SET title       = ?,
                            description = ?,

@@ -1,7 +1,7 @@
 'use strict';
 
-var eventModel = require('../models/EventModel');
-var auth = require('../Auth');
+let eventModel = require('../models/EventModel');
+let auth = require('../Auth');
 exports.getEvents = function (req, res) {
     eventModel.getEvents().then(function (data) {
         let events = data.data;
