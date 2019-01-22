@@ -6,7 +6,7 @@ var moment = require('moment');
 module.exports = {
     getEvents: function () {
         return new Promise(function (resolve, reject) {
-            con.query("SELECT * FROM events ORDER BY start ASC", function (err, res) {
+            con.query("SELECT * FROM events WHERE approved = 1 ORDER BY start ASC", function (err, res) {
                 if (err) {
                     reject({
                         success: false,

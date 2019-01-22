@@ -192,11 +192,13 @@ module.exports = {
     },
     getSpaceReservations: function(req, space_id){
         return new Promise(function (resolve, reject) {
-            con.query("SELECT * FROM space_reservations WHERE space_id = ?",[space_id], function (err, res) {
+            con.query("SELECT cast(concat(date,' ',start) as datetime) as start, cast(concat(date,' ', end) as datetime) as end, " +
+                "name, email, space_id, phone, space_title FROM space_reservations WHERE space_id = ?",[space_id], function (err, res) {
                 if (err) {
+                    console.log(err)
                     reject({
                         success: false,
-                        data: "Failed to get spaces"
+                        data: "Failed to get space12s"
                     })
                 } else {
                     resolve({
