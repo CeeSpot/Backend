@@ -1,7 +1,7 @@
 'use strict';
 var config = require('../config');
-var moment = require('moment');
 var authorisationModel = require('../models/AuthorisationModel');
+var moment = require('moment');
 
 module.exports = {
     getEvents: function () {
@@ -21,7 +21,23 @@ module.exports = {
             })
         });
     },
-    getUpcomingEvents: function () {
+    getEventCategories: function () {
+        return new Promise(function (resolve, reject) {
+            con.query("SELECT * FROM event_categories ORDER BY value ASC", function (err, res) {
+                if (err) {
+                    reject({
+                        success: false,
+                        data: "Failed to get event categories."
+                    })
+                } else {
+                    resolve({
+                        success: true,
+                        data: res
+                    });
+                }
+            })
+        });
+    },getUpcomingEvents: function () {
         let today = moment().startOf('day').format('YYYY-MM-DD HH:mm:ss');
 
         return new Promise(function (resolve, reject) {
@@ -107,7 +123,7 @@ module.exports = {
     addEvent: function (req) {
         return new Promise(function (resolve, reject) {
             authorisationModel.allowEventBookingNoConfirm(req.user).then((resp) => {
-                req.body.event.approved = resp.noconfirm ? 1 : 0
+                req.body.event.approved = resp.noconfirm ? 1 : 0;
                 con.query("INSERT INTO events SET ?", [req.body.event], function (err, res) {
                     if (err) {
                         reject({
@@ -250,6 +266,25 @@ module.exports = {
             con.query(`SELECT *
                        FROM events
                        WHERE id = ?`, [req.params.event_id], function (err, res) {
+                if (err) {
+                    reject({
+                        success: false,
+                        data: "Failed to get event"
+                    })
+                } else {
+                    resolve({
+                        success: true,
+                        data: res
+                    });
+                }
+            })
+        });
+    },
+    getEventFromID: function (event_id) {
+        return new Promise(function (resolve, reject) {
+            con.query(`SELECT *
+                       FROM events
+                       WHERE id = ?`, [event_id], function (err, res) {
                 if (err) {
                     reject({
                         success: false,

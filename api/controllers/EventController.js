@@ -2,6 +2,8 @@
 
 let eventModel = require('../models/EventModel');
 let auth = require('../Auth');
+var iCalModel = require('../models/iCalModel');
+
 exports.getEvents = function (req, res) {
     eventModel.getEvents().then(function (data) {
         let events = data.data;
@@ -40,6 +42,14 @@ exports.getUpcomingEvents = function (req, res) {
     });
 };
 
+exports.getEventCategories = function (req, res) {
+    eventModel.getEventCategories(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
+
 exports.addUserEvent = function (req, res) {
     eventModel.addUserEvent(req).then(function (data) {
         res.send(data);
@@ -58,6 +68,9 @@ exports.removeUserEvent = function (req, res) {
 
 exports.addEvent = function (req, res) {
     eventModel.addEvent(req).then(function (data) {
+        if (data.success){
+            iCalModel.updateICSfile();
+        }
         res.send(data);
     }).catch(function (err) {
         res.send(err);
@@ -116,4 +129,30 @@ exports.getEvent = function (req, res) {
     }).catch(function (err) {
         res.send(err);
     });
+};
+
+exports.getEventiCal = function (req, res) {
+    let path = iCalModel.getICSfromEvent(req);
+    if (path.length > 0){
+        const fs = require('fs')
+        let readStream = fs.createReadStream(path)
+        readStream.on('close', () => res.end())
+        readStream.pipe(res)
+    }
+    else{
+        res.status(400).send('failed to get ical')
+    }
+};
+
+exports.getAllEventsiCal = function (req, res) {
+    let path = iCalModel.getICSAllEvents();
+    if (path.length > 0){
+        const fs = require('fs')
+        let readStream = fs.createReadStream(path)
+        readStream.on('close', () => res.end())
+        readStream.pipe(res)
+    }
+    else{
+        res.status(400).send('failed to get ical')
+    }
 };
