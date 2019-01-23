@@ -6,29 +6,22 @@ var authorisationModel = require('../models/AuthorisationModel');
 module.exports = {
     getSettings: function (req) {
         return new Promise(function (resolve, reject) {
-            if(req.user.isAdmin) {
-                con.query(`SELECT *
-                           FROM settings`, function (err, res) {
-                    if (err) {
-                        reject({
-                            success: false,
-                            data: "Failed to get settings",
-                            authorised: true
-                        })
-                    } else {
-                        resolve({
-                            success: true,
-                            data: res,
-                            authorised: true
-                        });
-                    }
-                })
-            } else {
-                reject({
-                    success: false,
-                    authorised: false
-                })
-            }
+            con.query(`SELECT *
+                       FROM settings`, function (err, res) {
+                if (err) {
+                    reject({
+                        success: false,
+                        data: "Failed to get settings",
+                        authorised: true
+                    })
+                } else {
+                    resolve({
+                        success: true,
+                        data: res,
+                        authorised: true
+                    });
+                }
+            })
         });
     },
     toggleBlogActive: function (req) {
