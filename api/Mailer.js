@@ -1,4 +1,4 @@
-var signature = `\nMet vriendelijke groet, \nBart-Jan`;
+let signature = `\nMet vriendelijke groet, \nBart-Jan`;
 
 module.exports = {
     sendMail: function(mailto, subject, body){
