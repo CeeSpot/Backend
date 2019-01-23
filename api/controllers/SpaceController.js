@@ -4,6 +4,8 @@ let moment = require('moment');
 let spaceModel = require('../models/SpaceModel');
 let mailer = require('../Mailer');
 
+var signature = `\nMet vriendelijke groet, \nBart-Jan`;
+
 exports.getSpaces = function (req, res) {
     spaceModel.getSpaces(req).then(function (data) {
         res.send(data);
@@ -63,9 +65,9 @@ exports.addBooking = function (req, res) {
         if (checkAvailability(data.data, req.body.reservation)){
             spaceModel.addBooking(req).then(function (data) {
                 if (data.success){
-                    let body = `Nieuw reserveringsverzoek, check het adminpanel biatchhhh`;
+                    let body = `Nieuw reserveringsverzoek, check het adminpanel.`;
 
-                    mailer.sendMail('ceespottest@gmail.com', 'Reserveringsverzoek', body);
+                    mailer.sendMail('ceespottest@gmail.com', 'Reserveringsverzoek', body + signature);
                 }
                 res.send(data);
             }).catch(function (err) {
@@ -95,7 +97,7 @@ exports.updateReservationState = function (req, res) {
         let subject = "Reserveringsverzoek " + req.body.reservation.space_title;
         let mailto = req.body.reservation.email;
         let body = `Beste ` + req.body.reservation.name + `,\nUw reservering voor de ` + req.body.reservation.space_title + `, op ` + moment(req.body.reservation.date).format('DD-MM-YYYY') + ` is goedgekeurd.`;
-        mailer.sendMail(mailto, subject, body);
+        mailer.sendMail(mailto, subject, body + signature);
         res.send(data);
     }).catch(function (err) {
         res.send(err);

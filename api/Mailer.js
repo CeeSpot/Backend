@@ -1,5 +1,3 @@
-var signature = `\nMet vriendelijke groet, \nBart-Jan`;
-
 module.exports = {
     sendMail: function(mailto, subject, body){
         let nodemailer = require('nodemailer');
@@ -16,7 +14,7 @@ module.exports = {
           from: 'ceespottest@gmail.com',
           to: mailto,
          subject: subject,
-         text: body + signature
+         text: body
       };
 
       transporter.sendMail(mailOptions, function(error, info){
