@@ -1,13 +1,13 @@
 'use strict';
 
-var userModel = require('../models/UserModel');
+let userModel = require('../models/UserModel');
 
 exports.getUsers = function (req, res) {
     // Get All users
     userModel.getUsers().then(function (data) {
         // Save userdata
-        var success = data.success;
-        var users = data.data;
+        let success = data.success;
+        let users = data.data;
 
         // Get all usertags
         userModel.getUserTags().then(function (tags) {

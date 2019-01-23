@@ -1,5 +1,6 @@
 'use strict';
 var config = require('../config');
+var authorisationModel = require('../models/AuthorisationModel');
 
 module.exports = {
     getSpaces: function (req) {
@@ -36,82 +37,92 @@ module.exports = {
             })
         });
     },
+
     updateSpace: function (req) {
         // Clone object and delete reservations (not a column in db)
-        let clone = req.body.data;
-        delete clone.reservations;
-
         return new Promise(function (resolve, reject) {
-            con.query("UPDATE spaces SET ? where id = ?", [clone, clone.id], function (err, res) {
-                if (err) {
-                    console.log(err);
-                    reject({
-                        success: false,
-                        data: "Failed to update space"
-                    })
-                } else {
-                    resolve({
-                        success: true,
-                        data: res
-                    });
-                }
-            })
+            if (req.user.isAdmin) {
+                let clone = req.body.space;
+                delete clone.reservations;
+                con.query("UPDATE spaces SET ? where id = ?", [clone, clone.id], function (err, res) {
+                    if (err) {
+                        console.log(err);
+                        reject({
+                            success: false,
+                            data: "Failed to update space",
+                            authorised: true
+                        })
+                    } else {
+                        resolve({
+                            success: true,
+                            data: res,
+                            authorised: true
+                        });
+                    }
+                })
+            } else {
+                reject({
+                    success: false,
+                    authorised: false
+                })
+            }
         });
     },
     deleteSpace: function (req) {
         return new Promise(function (resolve, reject) {
-            con.query("DELETE FROM spaces WHERE id = ?", [req.body.space_id], function (err, res) {
-                if (err) {
-                    reject({
-                        success: false,
-                        data: "Failed to delete space"
-                    })
-                } else {
-                    resolve({
-                        success: true,
-                        data: res
-                    });
-                }
-            })
-        });
-    },
-    addRequest: function (req) {
-        return new Promise(function (resolve, reject) {
-            con.query("INSERT INTO space_reservations SET ?", [req.body.data], function (err, res) {
-                if (err) {
-                    reject({
-                        success: false,
-                        data: "Failed to add reservation"
-                    })
-                } else {
-                    resolve({
-                        success: true,
-                        data: res
-                    });
-                }
-            })
+            if (req.user.isAdmin) {
+                con.query("DELETE FROM spaces WHERE id = ?", [req.body.space_id], function (err, res) {
+                    if (err) {
+                        reject({
+                            success: false,
+                            data: "Failed to delete space",
+                            authorised: true
+                        })
+                    } else {
+                        resolve({
+                            success: true,
+                            data: res,
+                            authorised: true
+                        });
+                    }
+                })
+            } else {
+                reject({
+                    success: false,
+                    authorised: false
+                })
+            }
         });
     },
     addSpace: function (req) {
         return new Promise(function (resolve, reject) {
-            con.query("INSERT INTO spaces SET ?", [req.body.data], function (err, res) {
-                if (err) {
+            con.query("INSERT INTO spaces SET ?", [req.body.space], function (err, res) {
+                if (req.user.isAdmin) {
+                    if (err) {
+                        reject({
+                            success: false,
+                            data: "Failed to get spaces",
+                            authorised: true
+                        })
+                    } else {
+                        resolve({
+                            success: true,
+                            data: res,
+                            authorised: true
+                        });
+                    }
+                } else {
                     reject({
                         success: false,
-                        data: "Failed to get spaces"
+                        authorised: false
                     })
-                } else {
-                    resolve({
-                        success: true,
-                        data: res
-                    });
                 }
             })
         });
     },
     getAvailable: function (req) {
         return new Promise(function (resolve, reject) {
-            con.query("SELECT * FROM space_reservations WHERE space_id = ? AND date = ?", [req.body.data.space_id, req.body.data.date], function (err, res) {
+            con.query("SELECT * FROM space_reservations WHERE space_id = ? AND date = ?", [req.body.reservation.space_id, req.body.reservation.date], function (err, res) {
                 if (err) {
                     reject({
                         success: false,
@@ -127,30 +138,67 @@ module.exports = {
         });
     },
     addBooking: function (req) {
-        var approved = {approved: 0};
         return new Promise(function (resolve, reject) {
-            con.query("INSERT INTO space_reservations SET ?, ?", [req.body.data, approved], function (err, res) {
-                if (err) {
-                    reject({
-                        success: false,
-                        data: "Failed to add booking"
-                    })
-                } else {
-                    resolve({
-                        success: true,
-                        data: res
-                    });
-                }
+            authorisationModel.allowSpaceBookingNoConfirm(req.user).then((resp) => {
+                req.body.reservation.approved = resp.noconfirm ? 1 : 0
+                con.query("INSERT INTO space_reservations SET ?", [req.body.reservation], function (err, res) {
+                    if (err) {
+                        reject({
+                            success: false,
+                            data: "Failed to add booking",
+                            authorised: true
+                        })
+                    } else {
+                        resolve({
+                            success: true,
+                            data: res,
+                            authorised: true
+                        });
+                    }
+                })
+            }).catch(() => {
+                reject({
+                    success:false,
+                    authorised: false
+                })
             })
         });
     },
     getSpaceRequests: function(req){
         return new Promise(function (resolve, reject) {
-            con.query("SELECT * FROM space_reservations WHERE approved = 0", function (err, res) {
+            if (req.user.isAdmin) {
+                con.query("SELECT * FROM space_reservations WHERE approved = 0", function (err, res) {
+                    if (err) {
+                        reject({
+                            success: false,
+                            data: "Failed to get spaces",
+                            authorised: true
+                        })
+                    } else {
+                        resolve({
+                            success: true,
+                            data: res,
+                            authorised: true
+                        });
+                    }
+                })
+            } else {
+                reject({
+                    success: false,
+                    authorised: false
+                })
+            }
+        });
+    },
+    getSpaceReservations: function(req, space_id){
+        return new Promise(function (resolve, reject) {
+            con.query("SELECT cast(concat(date,' ',start) as datetime) as start, cast(concat(date,' ', end) as datetime) as end, " +
+                "name, email, space_id, phone, space_title FROM space_reservations WHERE space_id = ?",[space_id], function (err, res) {
                 if (err) {
+                    console.log(err)
                     reject({
                         success: false,
-                        data: "Failed to get spaces"
+                        data: "Failed to get space12s"
                     })
                 } else {
                     resolve({
@@ -161,39 +209,30 @@ module.exports = {
             })
         });
     },
-    getSpaceReservations: function(req, space_id){
+    updateReservationState: function(req, space_id){
         return new Promise(function (resolve, reject) {
-            con.query("SELECT * FROM space_reservations WHERE space_id = ?",[space_id], function (err, res) {
-                if (err) {
-                    reject({
-                        success: false,
-                        data: "Failed to get spaces"
-                    })
-                } else {
-                    resolve({
-                        success: true,
-                        data: res
-                    });
-                }
-            })
-        });
-    }
-    ,
-    appDecReservation: function(req, space_id){
-        return new Promise(function (resolve, reject) {
-            con.query("UPDATE space_reservations SET approved = ? where id = ?", [req.body.data.approved, req.body.data.id], function (err, res) {
-                if (err) {
-                    reject({
-                        success: false,
-                        data: "Failed to get spaces"
-                    })
-                } else {
-                    resolve({
-                        success: true,
-                        data: res
-                    });
-                }
-            })
+            if (req.user.isAdmin) {
+                con.query("UPDATE space_reservations SET approved = ? where id = ?", [req.body.reservation.approved, req.body.reservation.id], function (err, res) {
+                    if (err) {
+                        reject({
+                            success: false,
+                            data: "Failed to get spaces",
+                            authorised: true
+                        })
+                    } else {
+                        resolve({
+                            success: true,
+                            data: res,
+                            authorised: true
+                        });
+                    }
+                })
+            } else {
+                reject({
+                    success:false,
+                    authorised: true
+                })
+            }
         });
     }
 };

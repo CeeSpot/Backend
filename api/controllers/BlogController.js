@@ -1,7 +1,8 @@
 'use strict';
 
-var blogModel = require('../models/BlogModel');
-var auth = require('../Auth');
+let blogModel = require('../models/BlogModel');
+let auth = require('../Auth');
+let authorisationModel = require('../models/AuthorisationModel');
 
 
 exports.getBlogs = function (req, res) {

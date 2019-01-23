@@ -1,7 +1,3 @@
-let userModel = require('./UserModel');
-let companyModel = require('./CompanyModel');
-
-let entities = require('./Entities/Entities');
 let companyEntities = require('./Entities/CompanyEntities');
 let userEntities = require('./Entities/UserEntities');
 module.exports = {

@@ -15,6 +15,8 @@
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "express-session": "^1.15.6",
+    "fs": "0.0.1-security",
+    "ics": "^2.10.0",
     "jsonwebtoken": "^8.4.0",
     "moment": "^2.23.0",
     "move-file": "^1.0.0",

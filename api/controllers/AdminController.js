@@ -1,7 +1,7 @@
 'use strict';
 
-var adminModel = require('../models/AdminModel');
-var auth = require('../Auth');
+let adminModel = require('../models/AdminModel');
+let auth = require('../Auth');
 
 
 exports.getSettings = function (req, res) {
