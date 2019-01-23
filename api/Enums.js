@@ -15,7 +15,7 @@ function getSocialMediaResourceDataBaseByType(type){
     return null;
 }
 module.exports = {
-    'userRoles': {
+    'resourceRoles': {
         'GUEST_USER': GUEST_USER,
         'FELLOW': FELLOW,
         'PARTNER': PARTNER,

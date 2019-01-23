@@ -16,14 +16,21 @@ function verifyToken(req, res, next) {
         }
         // if everything good, save to request for use in other routes
         req.user = decoded;
-        config.con.query("SELECT user_role_id FROM user_user_roles WHERE user_id = ?", [decoded.id], function (err, res) {
-            req.user.isGuestUser = res[0].user_role_id === Enums.userRoles.GUEST_USER;
-            req.user.isFellow = res[0].user_role_id === Enums.userRoles.FELLOW;
-            req.user.isPartner = res[0].user_role_id === Enums.userRoles.PARTNER;
-            req.user.isStandardUser = res[0].user_role_id === Enums.userRoles.STANDARD_USER;
-            req.user.isAdmin = res[0].user_role_id === Enums.userRoles.ADMIN;
+        if (typeof req.user.company_resource_roles === 'undefined' || req.user.company_resource_roles === null) {
+            config.con.query("SELECT user_role_id FROM user_user_roles WHERE user_id = ?", [decoded.id], function (err, res) {
+                req.user.isGuestUser = res[0].user_role_id === Enums.resourceRoles.GUEST_USER;
+                req.user.isFellow = res[0].user_role_id === Enums.resourceRoles.FELLOW;
+                req.user.isPartner = res[0].user_role_id === Enums.resourceRoles.PARTNER;
+                req.user.isStandardUser = res[0].user_role_id === Enums.resourceRoles.STANDARD_USER;
+                req.user.isAdmin = res[0].user_role_id === Enums.resourceRoles.ADMIN;
+                next();
+            });
+        } else {
+            req.user.isCompany = true;
+            req.company = req.user;
+            delete req.user
             next();
-        });
+        }
     });
 }
 function verifyFunctionToken(req, optional = false) {

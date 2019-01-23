@@ -24,7 +24,7 @@ function getResourceSocialMediaSites(resourceId, type, excluded = {}) {
  */
 function checkIfResourceSiteExists(socialMediaId, resourceId, type) {
     return new Promise((resolve, reject) => {
-        console.log(socialMediaId,resourceId,type);
+        console.log(socialMediaId, resourceId, type);
         config.con.query(`SELECT resource_id
                           FROM social_media_resources
                           WHERE resource_id = ?
@@ -101,8 +101,8 @@ function insertResourceRecord(resourceId, type, record) {
                     });
                 }
             }).catch((err) => reject({success: true, data: "Something went wrong"}))
-        }else{
-            resolve(deleteResourceRecord(record,type));
+        } else {
+            resolve(deleteResourceRecord(record, type));
         }
     })
 }
@@ -129,28 +129,53 @@ function updateResourceRecord(record, type) {
                 }
             }).catch((err) => reject(err));
         } else {
-            resolve(deleteResourceRecord(record,type));
+            resolve(deleteResourceRecord(record, type));
         }
     });
 }
+
 function deleteResourceRecord(record, type) {
-    return new Promise((resolve,reject) => {
-        checkIfResourceSiteExists(record.social_media_id, record.resource_id,type).then((data) => {
-            if(data === true) {
+    return new Promise((resolve, reject) => {
+        checkIfResourceSiteExists(record.social_media_id, record.resource_id, type).then((data) => {
+            if (data === true) {
                 config.con.query("DELETE FROM social_media_resources WHERE social_media_id = ? AND resource_id = ? AND type = ?",
                     [record.social_media_id, record.resource_id, type],
                     function (err, res) {
                         if (err) {
                             console.log(err.toString());
                             reject({success: false, data: "Failed to remove URL for " + record.site});
-                        }
-                        else resolve({success: true, data: "Successfully removed record"});
+                        } else resolve({success: true, data: "Successfully removed record"});
                     });
             }
         }).catch((err) => {
-            reject({success:false, data: "Something went wrong"})
+            reject({success: false, data: "Something went wrong"})
         });
     });
+}
+
+function deleteResourceRecords(userId, type) {
+    return new Promise((resolve, reject) => {
+        config.con.query(`DELETE FROM social_media_resources WHERE resource_id = ? and \`type\` = ?`, [userId, type], (err, res) => {
+            resolve()
+        })
+        // for (let i = 0; i < records.length; i++) {
+        //     deleteResourceRecord(records[i], type).then(() => {
+        //         if (i === records.length - 1) {
+        //             resolve();
+        //         }
+        //     }).catch(() => {
+        //         if (i === records.length - 1) {
+        //             resolve();
+        //         }
+        //     });
+        // }
+    })
+}
+
+function deleteResourceRecordsForUser(userId) {
+    return new Promise((resolve, reject) => {
+        resolve(deleteResourceRecords(userId, Enums.socialMediaRoles.SOCIAL_MEDIA_USER))
+    })
 }
 
 function insertResourceRecords(resourceId, type, socialMediaResourceSites) {
@@ -235,5 +260,6 @@ function updateResourceRecords(resourceId, type, socialMediaResourceSites) {
 module.exports = {
     'insertResourceRecords': insertResourceRecords,
     'updateResourceRecords': updateResourceRecords,
-    'getResourceSocialMediaSites': getResourceSocialMediaSites
+    'getResourceSocialMediaSites': getResourceSocialMediaSites,
+    'deleteResourceRecordsForUser': deleteResourceRecordsForUser
 };

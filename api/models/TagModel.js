@@ -6,9 +6,15 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             config.con.query("SELECT * FROM tags", function (err, res) {
                 if (err) {
-                    reject(err)
+                    reject({
+                        success: false,
+                        data: 'Something went wrong getting tags'
+                    })
                 } else {
-                    resolve(res);
+                    resolve({
+                        success: true,
+                        data: res
+                    });
                 }
             })
         });

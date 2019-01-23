@@ -4,6 +4,7 @@ let Enums = require('../Enums');
 let Entities = require('./Entities/Entities');
 let SocialMediaEntities = require("./Entities/SocialMediaEntities");
 let UserEntities = require("./Entities/UserEntities");
+let CompanyEntities = require("./Entities/CompanyEntities");
 module.exports = {
     getSites: function () {
         return new Promise(function (resolve, reject) {
@@ -54,16 +55,27 @@ module.exports = {
                             errors.update = updatedData.errors;
                             updatedRecords += updatedData.updatedRecords;
                         }
-
-                        UserEntities.updateWebsite(resource_id, req.user.username, ownSite).then((updatedSite) => {
-                            resolve({
-                                success:true,
-                                errors : errors,
-                                insertedRecords : insertedRecords,
-                                updatedRecords: updatedRecords,
-                                token: updatedSite.token
+                        if(typeof req.user !== 'undefined' && typeof req.company === 'undefined') {
+                            UserEntities.updateWebsite(resource_id, req.user.username, ownSite).then((updatedSite) => {
+                                resolve({
+                                    success: true,
+                                    errors: errors,
+                                    insertedRecords: insertedRecords,
+                                    updatedRecords: updatedRecords,
+                                    token: updatedSite.token
+                                })
                             })
-                        })
+                        } else {
+                            CompanyEntities.updateWebsite(resource_id, req.company.username, ownSite).then((updatedSite) => {
+                                resolve({
+                                    success: true,
+                                    errors: errors,
+                                    insertedRecords: insertedRecords,
+                                    updatedRecords: updatedRecords,
+                                    token: updatedSite.token
+                                })
+                            })
+                        }
                     })
                 })
             }

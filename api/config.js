@@ -17,5 +17,6 @@ con.connect(function(err) {
 
 module.exports = {
     'secret': 'superdupersecretpass',
-    'con': con
+    'con': con,
+    'encryptRounds': 10
 };

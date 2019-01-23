@@ -1,9 +1,10 @@
 /**
  * Created by thama on 23-11-2018.
  */
-let bcrypt = require('bcryptjs');
 let entities = require('./Entities');
 let config = require('../../config');
+var moment = require('moment');
+let bcrypt = require('bcryptjs');
 
 /**
  * Gets a user by username
@@ -21,10 +22,39 @@ function getUserByUsername(username, toRemove = null) {
             } else {
                 let user = !toRemove ? entities.getJsonObjectFromDatabaseObject(results[0]) : entities.getJsonObjectFromDatabaseObject(results[0], toRemove);
                 resolve({
+                    success: true,
                     userFound: true,
                     user: user
                 });
             }
+        });
+    });
+}
+
+
+
+function authenticate(req){
+    return new Promise(function (resolve, reject) {
+        getUserByUsername(req.body.username).then(function (data) {
+            if (!data.userFound) {
+                reject({success: false, data: data.data.toString()});
+            } else {
+                entities.comparePassword(req.body.password, data.user.password).then(function (passwordData) {
+                    if (!passwordData.isMatch) {
+                        reject({success: false, data: passwordData.data.toString()});
+                    } else {
+                        let user = entities.getJsonObjectFromDatabaseObject(data.user, {password: true});
+                        resolve({
+                            success: true,
+                            token: entities.signToken(user)
+                        });
+                    }
+                }).catch(function (err) {
+                    reject({success: false, data: err.data.toString()});
+                });
+            }
+        }).catch(function (err) {
+            reject({success: false, data: err.data.toString()});
         });
     });
 }
@@ -36,9 +66,18 @@ function getUserByUsername(username, toRemove = null) {
  * @param id
  * @returns {Promise<any>}
  */
-function updateUser(data, id) {
+function updateUser(data, id, me = false) {
     let self = this;
     data.mailVis = data.mailVis ? 1 : 0;
+    data.addressVis = data.addressVis ? 1 : 0;
+    data.birthdateVis = data.birthdateVis ? 1 : 0;
+    data.birthdate = moment(data.birthdate).format('YYYY-MM-DD HH:mm:ss');
+    if(data.birthdate === 'Invalid date') {
+        delete data.birthdate
+    }
+
+    let username = data.username;
+    delete data.username;
     delete data.social_media_sites;
     delete data.tags;
     delete data.isGuestUser;
@@ -46,57 +85,50 @@ function updateUser(data, id) {
     delete data.isPartner;
     delete data.isStandardUser;
     delete data.isAdmin;
-    console.log(data);
+
     return new Promise(function (resolve, reject) {
         config.con.query("UPDATE users SET ? where id = ?", [data, id], function (err, res) {
             if (err) {
-                console.log(err.toString());
                 reject({success: false, data: err.toString()});
             }
-            self.getUserByUsername(data.username, {password: true}).then(userData => {
-                resolve({success: true, token: entities.signToken(userData.user)})
-            });
+            if (me) {
+                getUserByUsername(username, {password: true}).then(userData => {
+                    let token = entities.signToken(userData.user)
+                    resolve({success: true, token: token})
+                }).catch((err) => {
+                    console.error(err);
+                });
+            } else {
+                resolve({
+                    success: true,
+                    data: 'Successfully this user\'s information'
+                })
+            }
         });
     });
 }
 
-function updateWebsite(userId, username, website) {
+function deleteUserRole(userId) {
     return new Promise((resolve, reject) => {
-        config.con.query("UPDATE users SET website = ? WHERE id = ?", [website,userId], function(err, res) {
-            if (err){
-                resolve({success:false, data: "Failed to update site for user"})
-            }else{
-                getUserByUsername(username, {password: true}).then(userData => {
-                    resolve({success: true, token: entities.signToken(userData.user)})
-                });
-            }
+        config.con.query(`DELETE FROM user_user_roles WHERE user_id = ?`, [userId], (err, res) => {
+            resolve()
         })
     })
 }
 
-/**
- * Compares a candidate password with a hash
- *
- * @param candidatePassword
- * @param hash
- * @returns {Promise}
- */
-function comparePassword(candidatePassword, hash) {
-    return new Promise(function (resolve, reject) {
-        bcrypt.compare(candidatePassword, hash, function (err, isMatch) {
-            if (err) reject({userFound: null, data: err.toString()});
-            if (!isMatch) {
-                resolve({isMatch: false, data: "Password is not correct"});
-            } else {
-                resolve({isMatch: true});
-            }
-        });
-    });
+function updateWebsite(userId, username, website) {
+    return new Promise((resolve, reject) => {
+        config.con.query("UPDATE users SET website = ? WHERE id = ?", [website, userId], function (err, res) {
+            getUserByUsername(username, {password: true}).then(userData => {
+                resolve({success: true, token: entities.signToken(userData.user)})
+            });
+        })
+    })
 }
 
 function insertAndUpdateUserRoles(user, data) {
     return new Promise(function (resolve, reject) {
-        if(data.companies.length === 0) {
+        if (data.companies.length === 0) {
             resolve()
         }
         for (let i = 0; i < data.companies.length; i++) {
@@ -129,7 +161,7 @@ function insertAndUpdateUserRoles(user, data) {
     });
 }
 
-function deleteUserRoles(data) {
+function deleteUserCompanies(data) {
     return new Promise((resolve, reject) => {
         if (data.deleted.length === 0) {
             resolve();
@@ -154,6 +186,51 @@ function deleteUserRoles(data) {
             })
         }
     });
+}
+function changePassword(req) {
+    return new Promise(function (resolve, reject) {
+        getUserByUsername(req.user.username).then(function (data) {
+            if (!data.userFound) {
+                reject({success: false, data: data.data.toString()}); // no user found, should probably logout?
+            } else {
+                entities.comparePassword(req.body.password, data.user.password).then(function (pwdata) {
+                    if (!pwdata.isMatch) {
+                        reject({success: false, data: pwdata.data.toString()});
+                    } else {
+                        bcrypt.genSalt(config.encryptRounds, function (err, salt) { //generate a salt with rounds
+                            bcrypt.hash(req.body.newPassword, salt, function (err, hash) {
+                                if (err) {
+                                    reject({success: false, data: err.toString()});
+                                } else {
+                                    updateUser({
+                                        password: hash,
+                                        username: req.user.username
+                                    }, req.user.id, true).then(function (data) {
+                                        resolve(data);
+                                    }).catch(function (err) {
+                                        reject(err);
+                                    });
+                                }
+                            });
+                        });
+                    }
+                }).catch(function (err) {
+                    reject({
+                        success: false,
+                        data: 'Original password is incorrect'
+                    });
+                });
+            }
+        }).catch(function () {
+            reject({
+                success: false,
+                data: 'Something went wrong'
+            });
+        });
+    });
+}
+
+function deleteUserCompaniesByUserId(userId) {
 }
 
 function insertUserTags(user, data) {
@@ -181,19 +258,35 @@ function insertUserTags(user, data) {
     })
 }
 
+function deleteUserCompanyRoles(userId) {
+    return new Promise((resolve, reject) => {
+        config.con.query(`DELETE FROM user_companies WHERE user_id = ?`, [userId], (err,res) => {
+            resolve()
+        })
+    })
+}
+
+function deleteUserTags(userId) {
+    return new Promise((resolve, reject) => {
+        config.con.query(`DELETE FROM user_tags WHERE user_id = ?`, [userId], (err, res) => {
+            resolve()
+        })
+    })
+}
+
 function deletedUserTags(user, data) {
-    return new Promise((resolve, rejected) => {
+    return new Promise((resolve, reject) => {
         if (data.deleted.length === 0) {
             resolve()
         }
         for (let i = 0; i < data.deleted.length; i++) {
-            if(data.deleted[i].id > -1) {
+            if (data.deleted[i].id > -1) {
                 config.con.query(`DELETE FROM user_tags WHERE id = ?`, [data.deleted[i].id], (err, res) => {
                     if (i === data.deleted.length - 1) {
                         resolve()
                     }
                 })
-            }else{
+            } else {
                 if (i === data.deleted.length - 1) {
                     resolve()
                 }
@@ -204,11 +297,15 @@ function deletedUserTags(user, data) {
 
 module.exports = {
     'getUserByUsername': getUserByUsername,
-    'comparePassword': comparePassword,
     'updateUser': updateUser,
     'insertAndUpdateUserRoles': insertAndUpdateUserRoles,
-    'deleteUserRoles': deleteUserRoles,
+    'deleteUserCompanies': deleteUserCompanies,
     'insertUserTags': insertUserTags,
     'deletedUserTags': deletedUserTags,
-    'updateWebsite': updateWebsite
+    'updateWebsite': updateWebsite,
+    'deleteUserRole': deleteUserRole,
+    'deleteUserTags': deleteUserTags,
+    'deleteUserCompanyRoles': deleteUserCompanyRoles,
+    'authenticate': authenticate,
+    'changePassword': changePassword
 };

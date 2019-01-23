@@ -7,7 +7,7 @@ let enums = require('../Enums');
 let SocialMediaModel = require('./SocialMediaModel');
 let SocialMediaEntities = require('./Entities/SocialMediaEntities');
 
-let encryptRounds = 10;
+let encryptRounds = config.encryptRounds;
 module.exports = {
     getUsers: function () {
         return new Promise(function (resolve, reject) {
@@ -41,7 +41,7 @@ module.exports = {
             })
         })
     },
-    getUserTagsById: function(id) {
+    getUserTagsById: function (id) {
         return new Promise((resolve, rejected) => {
             config.con.query("SELECT ut.id, ut.tag_id, t.description FROM tags t LEFT JOIN user_tags ut ON ut.tag_id=t.id LEFT JOIN users u ON u.id=ut.user_id WHERE u.id = ?", [id], function (err, res) {
                 if (err) {
@@ -97,7 +97,7 @@ module.exports = {
                                         let user_id = res.insertId;
                                         let user_user_role_insert = {
                                             user_id: user_id,
-                                            user_role_id: 1000
+                                            user_role_id: enums.resourceRoles.GUEST_USER
                                         };
                                         let company_id = req.body.company_id;
 
@@ -143,31 +143,6 @@ module.exports = {
             });
         });
     },
-    authenticate: function (req) {
-        return new Promise(function (resolve, reject) {
-            userEntities.getUserByUsername(req.body.username).then(function (data) {
-                if (!data.userFound) {
-                    reject({success: false, data: data.data.toString()});
-                } else {
-                    userEntities.comparePassword(req.body.password, data.user.password).then(function (passwordData) {
-                        if (!passwordData.isMatch) {
-                            reject({success: false, data: passwordData.data.toString()});
-                        } else {
-                            let user = entities.getJsonObjectFromDatabaseObject(data.user, {password: true});
-                            // let token = jwt.sign(user, config.secret, {expiresIn: 86400});
-                            // entities.signToken(user)
-                            resolve(entities.signToken(user));
-                        }
-                    }).catch(function (err) {
-                        reject({success: false, data: err.data.toString()});
-                    });
-                }
-            }).catch(function (err) {
-                reject({success: false, data: err.data.toString()});
-            });
-        });
-    },
-
     /**
      * Gets a user's profile
      * @param req request given to get the userid from the request
@@ -222,6 +197,8 @@ module.exports = {
                     reject({success: false, user: "Something went wrong"});
                 }
                 req.user.mailVis = req.user.mailVis === 1;
+                req.user.addressVis = req.user.addressVis === 1;
+                req.user.birthdateVis = req.user.birthdateVis === 1;
 
                 req.user.companies = [];
                 if (res.length > 0) {
@@ -248,131 +225,84 @@ module.exports = {
             });
         });
     },
-    updateMe: function (req) {
+    updateUser: function (req) {
         return new Promise(function (resolve, reject) {
-            if (req.user.username !== req.body.user.username) {
+            if (req.user.id === req.body.user.id || req.user.isAdmin) {
                 userEntities.getUserByUsername(req.body.user.username).then((resp) => {
+                    console.log(resp)
                     if (!resp.success) reject(resp);
-                    userEntities.updateUser(req.body.user, req.user.id).then((resp) => {
-                        resolve(resp);
+                    userEntities.updateUser(req.body.user, req.user.id, req.user.id === req.body.user.id).then((updatedUserResp) => {
+                        console.log(updatedUserResp)
+                        resolve(updatedUserResp);
                     }).catch((err) => {
                         reject(err)
                     });
                 }).catch((err) => {
-                    reject({success: false, data: "Username already exists"});
+                    reject({success: false, data: "Username doesnt exist"});
                 })
             } else {
-                userEntities.updateUser(req.body.user, req.user.id).then((resp) => {
-                    resolve(resp);
-                }).catch((err) => {
-                    reject(err)
-                });
+                reject({
+                    success: false,
+                    data: 'You are not authorised to update this user'
+                })
             }
         })
     },
     deleteUser: function (req) {
         return new Promise(function (resolve, reject) {
-            let user_id = req.body.user_id;
-            con.query("DELETE FROM users WHERE id = ?", [user_id], function (err, res) {
-                if (err) {
-                    console.log(err);
-                    reject({
-                        success: false,
-                        data: "Failed to delete user"
-                    })
-                } else {
-                    console.log(res);
-                    resolve({
-                        success: true,
-                        data: "Successfully deleted user"
-                    });
-                }
-            })
-        })
-    },
-    updateUser: function (req) {
-        return new Promise(function (resolve, reject) {
-            con.query("UPDATE users SET ? where id = ?", [req.body.data, req.body.data.id], function (err, res) {
-                if (err) {
-                    console.log(err);
-                    reject({
-                        success: false,
-                        data: "Failed to update user"
-                    });
-                }
-                else {
-                    console.log(res);
-                    resolve({
-                        success: true,
-                        data: "Successfully updated user"
-                    });
-                }
-            });
-        })},
-    changePassword: function (req) {
-        return new Promise(function (resolve, reject) {
-            userEntities.getUserByUsername(req.user.username).then(function (data) {
-                if (!data.userFound) {
-                    reject({success: false, data: data.data.toString()}); // no user found, should probably logout?
-                } else {
-                    userEntities.comparePassword(req.body.password, data.user.password).then(function (pwdata) {
-                        if (!pwdata.isMatch) {
-                            reject({success: false, data: pwdata.data.toString()});
-                        } else {
-                            bcrypt.genSalt(encryptRounds, function (err, salt) { //generate a salt with rounds
-                                bcrypt.hash(req.body.newPassword, salt, function (err, hash) {
-                                    if (err) {
-                                        reject({success: false, data: err.toString()});
-                                    } else {
-                                        userEntities.updateUser({
-                                            password: hash,
-                                            username: req.user.username
-                                        }, req.user.id).then(function (data) {
-                                            resolve(data);
-                                        }).catch(function (err) {
-                                            reject(err);
-                                        });
-                                    }
-                                });
-                            });
-                        }
-                    }).catch(function (err) {
+            if (req.user.isAdmin || req.user.id === req.body.user_id) {
+                let user_id = req.body.user_id;
+                config.con.query("DELETE FROM users WHERE id = ?", [user_id], function (err, res) {
+                    if (err) {
+                        console.log("hi there, this went wrong")
                         reject({
                             success: false,
-                            data: 'Original password is incorrect'
-                        });
-                    });
-                }
-            }).catch(function () {
-                reject({
-                    success: false,
-                    data: 'Something went wrong'
-                });
-            });
-        });
+                            data: "Failed to delete user"
+                        })
+                    } else {
+                        SocialMediaEntities.deleteResourceRecordsForUser(req.user.id).then(() => {
+                            console.log("came here")
+                            userEntities.deleteUserRole(req.user.id).then(() => {
+                                console.log("came here")
+                                userEntities.deleteUserCompanyRoles(req.user.id).then(() => {
+                                    console.log("came here")
+                                    userEntities.deleteUserTags(req.user.id).then(() => {
+                                        console.log("came here")
+                                        resolve({
+                                            success: true,
+                                            data: "Successfully deleted user"
+                                        });
+                                    })
+                                })
+                            })
+                        })
+                    }
+                })
+            }
+        })
     },
     addUserCompany: function (req) {
         return new Promise((resolve, reject) => {
             userEntities.insertAndUpdateUserRoles(req.user, req.body).then((data) => {
-                userEntities.deleteUserRoles(req.body).then((data) => {
-                    resolve({success:false, data: 'Successfully updated the company roles of your user account'})
+                userEntities.deleteUserCompanies(req.body).then((data) => {
+                    resolve({success: false, data: 'Successfully updated the company roles of your user account'})
                 }).catch((err) => {
-                    resolve({success:false, data: 'Successfully updated the company roles of your user account'})
+                    resolve({success: false, data: 'Successfully updated the company roles of your user account'})
                 })
             }).catch((err) => {
-                userEntities.deleteUserRoles(req.body).then((data) => {
-                    resolve({success:false, data: 'Successfully updated the company roles of your user account'})
+                userEntities.deleteUserCompanies(req.body).then((data) => {
+                    resolve({success: false, data: 'Successfully updated the company roles of your user account'})
                 }).catch((err) => {
-                    resolve({success:false, data: 'Successfully updated the company roles of your user account'})
+                    resolve({success: false, data: 'Successfully updated the company roles of your user account'})
                 })
             })
         })
     },
-    addTags: function(req) {
+    addTags: function (req) {
         return new Promise((resolve, reject) => {
             userEntities.insertUserTags(req.user, req.body).then((data) => {
                 userEntities.deletedUserTags(req.user, req.body).then((data) => {
-                    resolve({success:false, data: 'Successfully updated your user account'})
+                    resolve({success: false, data: 'Successfully updated your user account'})
                 })
             });
         })
