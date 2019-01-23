@@ -1,12 +1,9 @@
-/**
- * Created by thama on 22-11-2018.
- */
-var jwt = require('jsonwebtoken');
-var config = require('./config');
-var Enums = require('./Enums');
+let jwt = require('jsonwebtoken');
+let config = require('./config');
+let Enums = require('./Enums');
 
 function verifyToken(req, res, next) {
-    var token = req.headers['x-access-token'];
+    let token = req.headers['x-access-token'];
     if (!token) {
         return res.status(403).send({success: false, authorised: false, message: 'No token provided.'});
     }
