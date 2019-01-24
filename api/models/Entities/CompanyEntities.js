@@ -13,7 +13,7 @@ function getCompanyByUsername(username, toRemove = null) {
     console.log(username)
     return new Promise(function (resolve, reject) {
         config.con.query("SELECT * from companies WHERE username = ? ORDER BY username LIMIT 1", [username], function (err, results) {
-            if (err) reject({userFound: null, data: "Failed to authenticate user"});
+            if (err) reject({userFound: null, data: "Failed to authenticate company"});
 
             if (typeof results === 'undefined' || results.length === 0) {
                 console.log("hi")
@@ -59,7 +59,6 @@ function authenticate(body) {
 }
 
 function updateCompany(data, id, me = false) {
-    console.log(data)
     let username = data.username;
     delete data.username;
     delete data.social_media_sites;
@@ -83,7 +82,7 @@ function updateCompany(data, id, me = false) {
             } else {
                 resolve({
                     success: true,
-                    data: 'Successfully this user\'s information'
+                    data: 'Successfully updated this companies\'s information'
                 })
             }
         });

@@ -6,7 +6,7 @@ module.exports = function (app) {
     app.route('/api/blogs').get(blogController.getBlogs);
     app.route('/api/blogs/tags').get(blogController.getBlogsTags);
     app.route('/api/blog/:blog_id').get(blogController.getBlog);
-    app.route('/api/blogs/add').post(blogController.addBlog);
-    app.route('/api/blogs/update').put(blogController.updateBlog);
-    app.route('/api/blogs/delete').delete(blogController.deleteBlog);
+    app.route('/api/blogs/add').post(auth.verifyToken, blogController.addBlog);
+    app.route('/api/blogs/update').put(auth.verifyToken, blogController.updateBlog);
+    app.route('/api/blogs/delete').delete(auth.verifyToken, blogController.deleteBlog);
 };

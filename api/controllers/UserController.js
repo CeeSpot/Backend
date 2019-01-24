@@ -34,14 +34,6 @@ exports.registerUser = function (req, res) {
     });
 };
 
-exports.authenticate = function (req, res) {
-    userModel.authenticate(req).then(function (data) {
-        res.json({success: true, token: data});
-    }).catch(function (err) {
-        res.send(err);
-    });
-};
-
 exports.profile = function (req, res) {
     userModel.profile(req).then(function (data) {
         res.send(data);
