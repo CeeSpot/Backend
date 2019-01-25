@@ -2,7 +2,7 @@
 var fs = require('fs');
 const moveFile = require('move-file');
 
-exports.file_upload_function = function (req, res, file) {
+exports.fileUpload = function (req, res, file) {
 
   let type = req.body.type;
   let id   = req.body.id;

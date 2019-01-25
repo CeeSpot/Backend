@@ -219,7 +219,7 @@ module.exports = {
                         if (err) {
                             reject({
                                 success: false,
-                                data: "Failed to remove blog tags.",
+                                data: "Failed to delete blog tags.",
                                 authorised: true
                             })
                         } else {

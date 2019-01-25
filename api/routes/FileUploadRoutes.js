@@ -6,6 +6,6 @@ let fileUploadController = require('../controllers/FileUploadController');
 
 module.exports = function (app) {
   app.post('/api/file_upload', upload.single('image'), (req, res) => {
-    fileUploadController.file_upload_function(req, res, req.file)
+    fileUploadController.fileUpload(req, res, req.file)
   });
 };
