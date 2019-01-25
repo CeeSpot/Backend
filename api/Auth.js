@@ -5,11 +5,11 @@ let Enums = require('./Enums');
 function verifyToken(req, res, next) {
     let token = req.headers['x-access-token'];
     if (!token) {
-        return res.status(403).send({success: false, authorised: false, message: 'No token provided.'});
+        return res.status(403).send({success: false, authorised: false, data: 'No token provided.'});
     }
     jwt.verify(token, config.secret, function (err, decoded) {
         if (err) {
-            return res.status(500).send({success: false, authorised: false, message: 'Failed to authenticate token.'});
+            return res.status(500).send({success: false, authorised: false, data: 'Failed to authenticate token.'});
         }
         // if everything good, save to request for use in other routes
         req.user = decoded;

@@ -112,7 +112,7 @@ module.exports = {
 
                                         config.con.query(`INSERT INTO companies SET ?`, post, function (err, res) {
                                             if (err) {
-                                                reject({success:false, data: err.toString()})
+                                                reject({success:false, data: "Something went wrong"})
                                             } else {
                                                 resolve({success:true, data: 'Successfully added your company account'})
                                             }
