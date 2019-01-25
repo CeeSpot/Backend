@@ -28,7 +28,17 @@ module.exports = {
   getText: function(req) {
     return new Promise(function (resolve, reject) {
       con.query("SELECT * FROM `text`", null, function(err, res){
-        resolve(res);
+        if (err) {
+          reject({
+            success: false,
+            data: "Something went wrong"
+          })
+        }else {
+          resolve({
+            success: true,
+            data: res
+          })
+        }
       });
     });
   }
