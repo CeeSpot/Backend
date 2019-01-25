@@ -8,8 +8,6 @@ const fs = require('fs');
 const http = require('http');
 const https = require('https');
 
-
-
 // Certificate
 if (false) {
   const privateKey = fs.readFileSync('/etc/letsencrypt/live/vps437.directvps.nl/privkey.pem', 'utf8');
@@ -43,7 +41,6 @@ app.use(express.static('static'));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 
-
 let users = require('./api/routes/UserRoutes'); //importing route
 let companies = require('./api/routes/CompanyRoutes'); //importing route
 let events = require('./api/routes/EventRoutes'); //importing route
@@ -55,6 +52,7 @@ let spaces = require('./api/routes/SpaceRoutes'); //importing route
 let admin = require('./api/routes/AdminRoutes'); //importing route
 let auth = require('./api/routes/AuthorisationRoutes'); //importing route
 let contact = require('./api/routes/ContactRoutes');
+let edittext = require('./api/routes/EditTextRoutes');
 
 users(app);
 companies(app);
@@ -67,5 +65,6 @@ fileUpload(app);
 admin(app);
 auth(app);
 contact(app);
+edittext(app);
 
 console.log('the cee spot RESTful API server started on: ' + port);
