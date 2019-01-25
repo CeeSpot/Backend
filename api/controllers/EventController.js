@@ -106,10 +106,10 @@ exports.getEvent = function (req, res) {
     eventModel.getEvent(req).then(function (data) {
         let event = data.data[0];
         event.participants = [];
-
         // Get event participants
         eventModel.getParticipants(event.id).then(function (p_data) {
             var participants = p_data.data;
+            console.log(participants);
             participants.forEach(participant => {
                 var object = {username: participant.username, id: participant.user_id, first_name: participant.first_name, insertions: participant.insertions, last_name: participant.last_name};
                 event.participants.push(object);
@@ -147,4 +147,12 @@ exports.getAllEventsiCal = function (req, res) {
     else{
         res.status(400).send('failed to get ical')
     }
+};
+
+exports.getParticipants = function (req, res) {
+    eventModel.getParticipants(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
 };
