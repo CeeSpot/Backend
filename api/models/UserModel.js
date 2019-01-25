@@ -277,15 +277,15 @@ module.exports = {
         return new Promise((resolve, reject) => {
             userEntities.insertAndUpdateUserRoles(req.user, req.body).then((data) => {
                 userEntities.deleteUserCompanies(req.body).then((data) => {
-                    resolve({success: false, data: 'Successfully updated the company roles of your user account'})
+                    resolve({success: true, data: 'Successfully updated the company roles of your user account'})
                 }).catch((err) => {
-                    resolve({success: false, data: 'Successfully updated the company roles of your user account'})
+                    resolve({success: false, data: 'Failed to delete company roles but succesfully updated of your user account'})
                 })
             }).catch((err) => {
                 userEntities.deleteUserCompanies(req.body).then((data) => {
-                    resolve({success: false, data: 'Successfully updated the company roles of your user account'})
+                    resolve({success: false, data: 'Failed to update/insert the company roles of your user account but successfully deleted any.'})
                 }).catch((err) => {
-                    resolve({success: false, data: 'Successfully updated the company roles of your user account'})
+                    resolve({success: false, data: 'Failed to insert/update/delete company roles of your user account'})
                 })
             })
         })
