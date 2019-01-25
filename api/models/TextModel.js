@@ -25,11 +25,38 @@ module.exports = {
       }
     });
   },
-  getText: function(req) {
+  getText: function (req) {
     return new Promise(function (resolve, reject) {
-      con.query("SELECT * FROM `text`", null, function(err, res){
-        resolve(res);
-      });
+      config.con.query(`SELECT * FROM text`, [req.params.blog_id], function (err, res) {
+        if (err) {
+          reject({
+            success: false,
+            data: "Failed to get text"
+          })
+        } else {
+          resolve({
+            success: true,
+            data: res
+          });
+        }
+      })
+    });
+  },
+  getOneText: function (req) {
+    return new Promise(function (resolve, reject) {
+      config.con.query(`SELECT * FROM text WHERE id = ?`, [req.params.text_id], function (err, res) {
+        if (err) {
+          reject({
+            success: false,
+            data: "Failed to get text"
+          })
+        } else {
+          resolve({
+            success: true,
+            data: res
+          });
+        }
+      })
     });
   }
 };
