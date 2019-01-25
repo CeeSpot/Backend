@@ -19,4 +19,7 @@ module.exports = function (app) {
     app.route('/api/events/userevent').delete(auth.verifyToken, eventController.removeUserEvent); //done
 
 
+    app.route('/api/events/requests').get(auth.verifyToken, eventController.getRequestsEvents); //done
+    app.route('/api/events/requests/state/:event_id').put(auth.verifyToken, eventController.updateRequestState); //done
+
 };

@@ -298,5 +298,57 @@ module.exports = {
                 }
             })
         });
+    },
+    getRequestsEvents: function (req) {
+        return new Promise(function (resolve, reject) {;
+            if (req.user.isAdmin) {
+                con.query("SELECT * FROM events WHERE approved = 0 ORDER BY start ASC", function (err, res) {
+                    if (err) {
+                        reject({
+                            success: false,
+                            data: "Failed to get events."
+                        })
+                    } else {
+                        resolve({
+                            success: true,
+                            data: res
+                        });
+                    }
+                })
+            } else {
+                reject({
+                    success: false,
+                    authorised: false
+                })
+            }
+        });
+    },
+    updateRequestState: function (req) {
+        return new Promise(function (resolve, reject) {
+            if (req.user.isAdmin) {
+                config.con.query(`UPDATE events
+                                  SET approved = 1
+                                  where id = ?`, [req.params.event_id], function (err, res) {
+                    if (err) {
+                        reject({
+                            success: false,
+                            data: "Failed to update request state.",
+                            authorised: true
+                        })
+                    } else {
+                        resolve({
+                            success: true,
+                            data: "Successfully updated request state.",
+                            authorised: true
+                        });
+                    }
+                })
+            } else {
+                reject({
+                    success: false,
+                    authorised: false
+                })
+            }
+        })
     }
 };
