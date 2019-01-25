@@ -1,12 +1,9 @@
-/**
- * Created by thama on 22-11-2018.
- */
-var mysql = require('mysql');
+let mysql = require('mysql');
 
 con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "",
+    host: "194.145.201.29",
+    user: "ceespot",
+    password: "ceespot",
     database: "the_cee_database"
 });
 
@@ -17,5 +14,6 @@ con.connect(function(err) {
 
 module.exports = {
     'secret': 'superdupersecretpass',
-    'con': con
+    'con': con,
+    'encryptRounds': 10
 };
