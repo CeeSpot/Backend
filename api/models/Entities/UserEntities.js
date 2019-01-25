@@ -96,12 +96,12 @@ function updateUser(data, id, me = false) {
                     let token = entities.signToken(userData.user)
                     resolve({success: true, token: token})
                 }).catch((err) => {
-                    console.error(err);
+                    reject(err);
                 });
             } else {
                 resolve({
                     success: true,
-                    data: 'Successfully this user\'s information'
+                    data: 'Successfully updated this user\'s information'
                 })
             }
         });
@@ -200,7 +200,7 @@ function changePassword(req) {
                         bcrypt.genSalt(config.encryptRounds, function (err, salt) { //generate a salt with rounds
                             bcrypt.hash(req.body.newPassword, salt, function (err, hash) {
                                 if (err) {
-                                    reject({success: false, data: err.toString()});
+                                    reject({success: false, data: "Something went wrong"});
                                 } else {
                                     updateUser({
                                         password: hash,

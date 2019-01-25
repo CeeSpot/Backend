@@ -21,9 +21,14 @@ module.exports = {
                         data: 'Failed to get companies'
                     })
                 } else {
+                    let companies = [];
+
+                    res.forEach(function (i) {
+                        companies.push(entities.getJsonObjectFromDatabaseObject(i, {password: true, username: true}))
+                    });
                     resolve({
                         success: true,
-                        data: res
+                        data: companies
                     });
                 }
             })
@@ -47,10 +52,11 @@ module.exports = {
                         if(err) {
                             reject({
                                 success: false,
-                                data: 'Failed to get users for this company'
+                                data: 'Failed to get employees for this company'
                             })
                         } else {
                             let company = companyRes[0];
+                            company = entities.getJsonObjectFromDatabaseObject(company, {password: true, username: true})
                             company.users = userCompanyRes;
                             SocialMediaEntities.getResourceSocialMediaSites(req.params.company_id, enums.socialMediaRoles.SOCIAL_MEDIA_COMPANY).then((data) => {
                                 company.social_media_sites = data;
@@ -138,7 +144,7 @@ module.exports = {
                 if(err) {
                     reject({
                         success: false,
-                        data: 'Something went wrong'
+                        data: 'Failed to get company tags'
                     })
                 }else {
                     req.company.tags = res;
@@ -170,12 +176,13 @@ module.exports = {
                         reject(err)
                     });
                 }).catch((err) => {
-                    reject({success: false, data: "Username doesnt exist"});
+                    reject(err);
                 })
             } else {
                 reject({
                     success: false,
-                    data: 'You are not authorised to update this account'
+                    data: 'You are not authorised to update this account',
+                    authorised: false
                 })
             }
         })

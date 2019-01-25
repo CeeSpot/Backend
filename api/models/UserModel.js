@@ -17,7 +17,7 @@ module.exports = {
                 } else {
                     let users = [];
                     res.forEach(function (i) {
-                        users.push(entities.getJsonObjectFromDatabaseObject(i, {password: true, username: false}))
+                        users.push(entities.getJsonObjectFromDatabaseObject(i, {password: true, username: true}))
                     });
                     resolve({success: true, data: users});
                 }

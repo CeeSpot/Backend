@@ -4,7 +4,7 @@ var config = require('../config');
 module.exports = {
   getBlogs: function (req) {
     return new Promise(function (resolve, reject) {
-      con.query(`SELECT id, title, description, body, picture, author, date_created FROM blogs ORDER BY date_created DESC`, function (err, res) {
+      config.con.query(`SELECT id, title, description, body, picture, author, date_created FROM blogs ORDER BY date_created DESC`, function (err, res) {
         if (err) {
           reject({
             success: false,
@@ -21,7 +21,7 @@ module.exports = {
   },
   getBlogsTags: function (req) {
     return new Promise(function (resolve, reject) {
-      con.query(`SELECT * FROM blogs_tags`, function (err, res) {
+      config.con.query(`SELECT * FROM blogs_tags`, function (err, res) {
         if (err) {
           reject({
             success: false,
@@ -38,7 +38,7 @@ module.exports = {
   },
   getBlogTags: function (req) {
     return new Promise(function (resolve, reject) {
-      con.query(`SELECT BT.blogs_tags_id AS id, BT.blog_id, T.description FROM blog_tags AS BT LEFT JOIN blogs_tags T ON T.id = BT.blogs_tags_id`, function (err, res) {
+      config.con.query(`SELECT BT.blogs_tags_id AS id, BT.blog_id, T.description FROM blog_tags AS BT LEFT JOIN blogs_tags T ON T.id = BT.blogs_tags_id`, function (err, res) {
         if (err) {
           reject({
             success: false,
@@ -55,7 +55,7 @@ module.exports = {
   },
   getBlog: function (req) {
     return new Promise(function (resolve, reject) {
-      con.query(`SELECT * FROM blogs WHERE id = ?`, [req.params.blog_id], function (err, res) {
+      config.con.query(`SELECT * FROM blogs WHERE id = ?`, [req.params.blog_id], function (err, res) {
         if (err) {
           reject({
             success: false,
@@ -73,7 +73,7 @@ module.exports = {
   addBlog: function (req) {
     return new Promise(function (resolve, reject) {
         if(req.user.isAdmin) {
-            con.query("INSERT INTO blogs SET ?", {
+            config.con.query("INSERT INTO blogs SET ?", {
                 title: req.body.title,
                 description: req.body.description,
                 body: req.body.body
@@ -91,7 +91,7 @@ module.exports = {
 
                     if (tags !== undefined) {
                         tags.forEach(tag => {
-                            con.query("INSERT INTO blog_tags SET ?", {
+                            config.con.query("INSERT INTO blog_tags SET ?", {
                                 blog_id: insertId,
                                 blogs_tags_id: tag.id
                             }, function (err, res) {
@@ -109,6 +109,12 @@ module.exports = {
                             },
                             authorised: true
                         });
+                    }else {
+                        reject({
+                            success: false,
+                            data: "Failed to add blog tags",
+                            authorised: true
+                        })
                     }
                 }
             })
@@ -169,6 +175,12 @@ module.exports = {
                                     authorised: true,
                                     data: "Successfully updated blog."
                                 });
+                            } else {
+                                reject({
+                                    success: false,
+                                    authorised: true,
+                                    data: "Failed to update blog tags"
+                                })
                             }
                         }
                     })
@@ -184,21 +196,30 @@ module.exports = {
   },
   deleteBlog: function (req) {
     return new Promise(function (resolve, reject) {
-      con.query("DELETE FROM blogs WHERE id = ?", [
-        req.body.blog_id
-      ], function (err, res) {
-        if (err) {
-          reject({
-            success: false,
-            data: "Failed to delete blog."
-          })
-        } else {
-          resolve({
-            success: true,
-            data: "Successfully deleted blog."
-          });
+        if (req.user.isAdmin) {
+            config.con.query("DELETE FROM blogs WHERE id = ?", [
+                req.body.blog_id
+            ], function (err, res) {
+                if (err) {
+                    reject({
+                        success: false,
+                        data: "Failed to delete blog.",
+                        authorised: true
+                    })
+                } else {
+                    resolve({
+                        success: true,
+                        data: "Successfully deleted blog.",
+                        authorised: true
+                    });
+                }
+            })
+        }else {
+            reject({
+                success:false,
+                authorised: false
+            })
         }
-      })
     })
   }
 };
