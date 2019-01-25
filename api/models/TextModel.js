@@ -4,7 +4,7 @@ var config = require('../config');
 module.exports = {
   editText: function(req){
     return new Promise(function (resolve, reject) {
-      let key = req.body.text_key;
+      let key = req.body.key;
       let value_nl = req.body.value_nl;
       let value_en = req.body.value_en;
 
