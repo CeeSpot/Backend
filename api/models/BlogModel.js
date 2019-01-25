@@ -89,7 +89,7 @@ module.exports = {
                     let insertId = res.insertId;
                     let success = true;
 
-                    if (tags !== undefined) {
+                    if (typeof tags !== 'undefined' && tags !== null) {
                         tags.forEach(tag => {
                             config.con.query("INSERT INTO blog_tags SET ?", {
                                 blog_id: insertId,
@@ -128,6 +128,7 @@ module.exports = {
   },
   updateBlog: function (req) {
     return new Promise(function (resolve, reject) {
+        console.log(req.user.isAdmin);
         if(req.user.isAdmin) {
             let tags = req.body.tags;
             con.query(`UPDATE blogs
@@ -158,17 +159,19 @@ module.exports = {
                                 authorised: true
                             })
                         } else {
-                            var success = true;
-                            tags.forEach(tag => {
-                                con.query("INSERT INTO blog_tags SET ?", {
-                                    blog_id: req.body.id,
-                                    blogs_tags_id: tag.id
-                                }, function (err, res) {
-                                    if (err) {
-                                        success = false;
-                                    }
+                            let success = true;
+                            if(typeof tags !== 'undefined' && tags !== null) {
+                                tags.forEach(tag => {
+                                    con.query("INSERT INTO blog_tags SET ?", {
+                                        blog_id: req.body.id,
+                                        blogs_tags_id: tag.id
+                                    }, function (err, res) {
+                                        if (err) {
+                                            success = false;
+                                        }
+                                    })
                                 })
-                            })
+                            }
                             if (success) {
                                 resolve({
                                     success: true,
@@ -196,6 +199,7 @@ module.exports = {
   },
   deleteBlog: function (req) {
     return new Promise(function (resolve, reject) {
+        console.log(req.user.isAdmin);
         if (req.user.isAdmin) {
             config.con.query("DELETE FROM blogs WHERE id = ?", [
                 req.body.blog_id
@@ -207,11 +211,25 @@ module.exports = {
                         authorised: true
                     })
                 } else {
-                    resolve({
-                        success: true,
-                        data: "Successfully deleted blog.",
-                        authorised: true
-                    });
+                    config,con.query(`DELETE
+                               FROM blog_tags
+                               WHERE blog_id = ?`, [
+                        req.body.blog_id
+                    ], function (err, res) {
+                        if (err) {
+                            reject({
+                                success: false,
+                                data: "Failed to remove blog tags.",
+                                authorised: true
+                            })
+                        } else {
+                            resolve({
+                                success: true,
+                                data: "Successfully deleted blog.",
+                                authorised: true
+                            });
+                        }
+                    })
                 }
             })
         }else {
