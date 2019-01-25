@@ -23,7 +23,7 @@ module.exports = {
                 if (err) {
                     reject({
                         success: false,
-                        data: 'Something went wrong getting tags'
+                        data: 'Something went wrong getting user tags'
                     })
                 } else {
                     resolve({
@@ -40,7 +40,7 @@ module.exports = {
                 if(err){
                     reject({
                         success: false,
-                        data: err.toString()
+                        data: "Something went wrong getting company tags"
                     })
                 } else {
                     resolve({
@@ -55,8 +55,8 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             let selectedTab = +req.params.id;
             let table = getTagTable(selectedTab);
-            con.query("INSERT INTO " + table + " SET ?", [req.body.tag], function (err, res) {
-                if (req.user.isAdmin) {
+            if (req.user.isAdmin) {
+                config.con.query("INSERT INTO " + table + " SET ?", [req.body.tag], function (err, res) {
                     if (err) {
                         reject({
                             success: false,
@@ -70,13 +70,13 @@ module.exports = {
                             authorised: true
                         });
                     }
-                } else {
-                    reject({
-                        success: false,
-                        authorised: false
-                    })
-                }
-            })
+                })
+            } else {
+                reject({
+                    success: false,
+                    authorised: false
+                })
+            }
         });
     },
     editTag: function(req){
@@ -84,7 +84,7 @@ module.exports = {
             let selectedTab = +req.params.id;
             let table = getTagTable(selectedTab);
             if (req.user.isAdmin) {
-                con.query("UPDATE " + table + " SET description = ? where id = ?", [req.body.tag.description, req.body.tag.id], function (err, res) {
+                config.con.query("UPDATE " + table + " SET description = ? where id = ?", [req.body.tag.description, req.body.tag.id], function (err, res) {
                     if (err) {
                         reject({
                             success: false,
@@ -112,7 +112,7 @@ module.exports = {
             let selectedTab = +req.params.id;
             let table = getTagTable(selectedTab);
             if (req.user.isAdmin) {
-                con.query("DELETE FROM " + table + " WHERE id = ?", [req.body.tag.id], function (err, res) {
+                config.con.query("DELETE FROM " + table + " WHERE id = ?", [req.body.tag.id], function (err, res) {
                     if (err) {
                         reject({
                             success: false,

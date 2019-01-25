@@ -102,14 +102,6 @@ exports.updateEvent = function (req, res) {
     });
 };
 
-exports.getParticipants = function (req, res) {
-    eventModel.getParticipants(req).then(function (data) {
-        res.send(data);
-    }).catch(function (err) {
-        res.send(err);
-    });
-};
-
 exports.getEvent = function (req, res) {
     eventModel.getEvent(req).then(function (data) {
         let event = data.data[0];

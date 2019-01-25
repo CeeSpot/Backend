@@ -4,20 +4,19 @@ var auth = require('../Auth');
 module.exports = function (app) {
 
     // example Routes
-    app.route('/api/events').get(eventController.getEvents);
-    app.route('/api/eventsupcoming').get(eventController.getUpcomingEvents);
-    app.route('/api/event/:event_id').get(eventController.getEvent);
-    app.route('/api/eventcategories').get(eventController.getEventCategories);
-    app.route('/api/ical/events/:event_id').get(eventController.getEventiCal);
-    app.route('/api/ical/events').get(eventController.getAllEventsiCal);
+    app.route('/api/events').get(eventController.getEvents); //done
+    app.route('/api/events/upcoming').get(eventController.getUpcomingEvents); // done
+    app.route('/api/event/:event_id').get(eventController.getEvent); //done
+    app.route('/api/events/categories').get(eventController.getEventCategories); //done
+    app.route('/api/ical/events/:event_id').get(eventController.getEventiCal); //done
+    app.route('/api/ical/events').get(eventController.getAllEventsiCal); //done
 
-    app.route('/api/events/add').post(auth.verifyToken, eventController.addEvent);
-    app.route('/api/events/delete').delete(auth.verifyToken, eventController.deleteEvent);
-    app.route('/api/events/update').put(auth.verifyToken, eventController.updateEvent);
+    app.route('/api/events/add').post(auth.verifyToken, eventController.addEvent); //done
+    app.route('/api/events/delete').delete(auth.verifyToken, eventController.deleteEvent); //done
+    app.route('/api/events/update').put(auth.verifyToken, eventController.updateEvent); //done
 
-    app.route('/api/events/participants/:event_id').get(eventController.getParticipants);
-    app.route('/api/events/userevent').post(auth.verifyToken, eventController.addUserEvent);
-    app.route('/api/events/userevent').delete(auth.verifyToken, eventController.removeUserEvent);
+    app.route('/api/events/userevent').post(auth.verifyToken, eventController.addUserEvent); //done
+    app.route('/api/events/userevent').delete(auth.verifyToken, eventController.removeUserEvent); //done
 
 
 };
