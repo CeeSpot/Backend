@@ -67,7 +67,6 @@ function authenticate(req){
  * @returns {Promise<any>}
  */
 function updateUser(data, id, me = false) {
-    let self = this;
     data.mailVis = data.mailVis ? 1 : 0;
     data.addressVis = data.addressVis ? 1 : 0;
     data.birthdateVis = data.birthdateVis ? 1 : 0;

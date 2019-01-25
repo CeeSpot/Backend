@@ -162,7 +162,7 @@ module.exports = {
                                        FROM user_companies 
                                        INNER JOIN companies ON user_companies.company_id = companies.id 
                                        WHERE user_companies.user_id = ?`, userid, function (err, res) {
-                        if (err) reject({success: false, data: err.toString()});
+                        if (err) reject({success: false, data:"Failed to get companies"});
                         if (res.length > 0) {
                             // Might have more than one company associated, thus return all of them
                             user.companies = [];
@@ -193,7 +193,6 @@ module.exports = {
                                INNER JOIN companies ON user_companies.company_id = companies.id 
                                WHERE user_companies.user_id = ?`, req.user.id, function (err, res) {
                 if (err) {
-                    console.log(err.toString());
                     reject({success: false, user: "Something went wrong"});
                 }
                 req.user.mailVis = req.user.mailVis === 1;
@@ -229,10 +228,8 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             if (req.user.id === req.body.user.id || req.user.isAdmin) {
                 userEntities.getUserByUsername(req.body.user.username).then((resp) => {
-                    console.log(resp)
                     if (!resp.success) reject(resp);
                     userEntities.updateUser(req.body.user, req.user.id, req.user.id === req.body.user.id).then((updatedUserResp) => {
-                        console.log(updatedUserResp)
                         resolve(updatedUserResp);
                     }).catch((err) => {
                         reject(err)
@@ -254,20 +251,15 @@ module.exports = {
                 let user_id = req.body.user_id;
                 config.con.query("DELETE FROM users WHERE id = ?", [user_id], function (err, res) {
                     if (err) {
-                        console.log("hi there, this went wrong")
                         reject({
                             success: false,
                             data: "Failed to delete user"
                         })
                     } else {
                         SocialMediaEntities.deleteResourceRecordsForUser(req.user.id).then(() => {
-                            console.log("came here")
                             userEntities.deleteUserRole(req.user.id).then(() => {
-                                console.log("came here")
                                 userEntities.deleteUserCompanyRoles(req.user.id).then(() => {
-                                    console.log("came here")
                                     userEntities.deleteUserTags(req.user.id).then(() => {
-                                        console.log("came here")
                                         resolve({
                                             success: true,
                                             data: "Successfully deleted user"
