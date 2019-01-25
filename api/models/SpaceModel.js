@@ -5,7 +5,9 @@ var authorisationModel = require('../models/AuthorisationModel');
 module.exports = {
     getSpaces: function (req) {
         return new Promise(function (resolve, reject) {
-            con.query(`SELECT * FROM spaces ORDER BY title ASC`, function (err, res) {
+            con.query(`SELECT *
+                       FROM spaces
+                       ORDER BY title ASC`, function (err, res) {
                 if (err) {
                     reject({
                         success: false,
@@ -22,7 +24,9 @@ module.exports = {
     },
     getSpace: function (req) {
         return new Promise(function (resolve, reject) {
-            con.query(`SELECT * FROM spaces WHERE id = ?`,[req.params.space_id], function (err, res) {
+            con.query(`SELECT *
+                       FROM spaces
+                       WHERE id = ?`, [req.params.space_id], function (err, res) {
                 if (err) {
                     reject({
                         success: false,
@@ -41,7 +45,7 @@ module.exports = {
     updateSpace: function (req) {
         // Clone object and delete reservations (not a column in db)
         return new Promise(function (resolve, reject) {
-            if (req.user.isAdmin) {
+            if (typeof req.user !== 'undefined' && req.user.isAdmin) {
                 let clone = req.body.space;
                 delete clone.reservations;
                 con.query("UPDATE spaces SET ? where id = ?", [clone, clone.id], function (err, res) {
@@ -70,7 +74,7 @@ module.exports = {
     },
     deleteSpace: function (req) {
         return new Promise(function (resolve, reject) {
-            if (req.user.isAdmin) {
+            if (typeof req.user !== 'undefined' && req.user.isAdmin) {
                 con.query("DELETE FROM spaces WHERE id = ?", [req.body.space_id], function (err, res) {
                     if (err) {
                         reject({
@@ -96,8 +100,8 @@ module.exports = {
     },
     addSpace: function (req) {
         return new Promise(function (resolve, reject) {
-            con.query("INSERT INTO spaces SET ?", [req.body.space], function (err, res) {
-                if (req.user.isAdmin) {
+            if (typeof req.user !== 'undefined' && req.user.isAdmin) {
+                con.query("INSERT INTO spaces SET ?", [req.body.space], function (err, res) {
                     if (err) {
                         reject({
                             success: false,
@@ -111,13 +115,14 @@ module.exports = {
                             authorised: true
                         });
                     }
-                } else {
-                    reject({
-                        success: false,
-                        authorised: false
-                    })
-                }
-            })
+
+                })
+            } else {
+                reject({
+                    success: false,
+                    authorised: false
+                })
+            }
         });
     },
     getAvailable: function (req) {
@@ -158,20 +163,20 @@ module.exports = {
                 })
             }).catch(() => {
                 reject({
-                    success:false,
+                    success: false,
                     authorised: false
                 })
             })
         });
     },
-    getSpaceRequests: function(req){
+    getSpaceRequests: function (req) {
         return new Promise(function (resolve, reject) {
-            if (req.user.isAdmin) {
+            if (typeof req.user !== 'undefined' && req.user.isAdmin) {
                 con.query("SELECT * FROM space_reservations WHERE approved = 0", function (err, res) {
                     if (err) {
                         reject({
                             success: false,
-                            data: "Failed to get spaces",
+                            data: "Failed to get spaces requests",
                             authorised: true
                         })
                     } else {
@@ -190,15 +195,14 @@ module.exports = {
             }
         });
     },
-    getSpaceReservations: function(req, space_id){
+    getSpaceReservations: function (req, space_id) {
         return new Promise(function (resolve, reject) {
             con.query("SELECT cast(concat(date,' ',start) as datetime) as start, cast(concat(date,' ', end) as datetime) as end, " +
-                "name, email, space_id, phone, space_title FROM space_reservations WHERE space_id = ?",[space_id], function (err, res) {
+                "name, email, space_id, phone, space_title FROM space_reservations WHERE space_id = ?", [space_id], function (err, res) {
                 if (err) {
-                    console.log(err)
                     reject({
                         success: false,
-                        data: "Failed to get space12s"
+                        data: "Failed to get space reservations"
                     })
                 } else {
                     resolve({
@@ -209,14 +213,14 @@ module.exports = {
             })
         });
     },
-    updateReservationState: function(req, space_id){
+    updateReservationState: function (req, space_id) {
         return new Promise(function (resolve, reject) {
-            if (req.user.isAdmin) {
+            if (typeof req.user !== 'undefined' && req.user.isAdmin) {
                 con.query("UPDATE space_reservations SET approved = ? where id = ?", [req.body.reservation.approved, req.body.reservation.id], function (err, res) {
                     if (err) {
                         reject({
                             success: false,
-                            data: "Failed to get spaces",
+                            data: "Failed to update space reservation",
                             authorised: true
                         })
                     } else {
@@ -229,7 +233,7 @@ module.exports = {
                 })
             } else {
                 reject({
-                    success:false,
+                    success: false,
                     authorised: true
                 })
             }

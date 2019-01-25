@@ -75,7 +75,7 @@ exports.addBooking = function (req, res) {
             });
         }
         else{
-            let msg = {data: {message: 'Room is already booked'}};
+            let msg = {success:false, data: {message: 'Room is already booked'}};
             res.send(msg);
         }
         //res.send(data);
