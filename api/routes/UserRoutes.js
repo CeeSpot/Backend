@@ -17,4 +17,7 @@ module.exports = function (app) {
 
     app.route('/api/users/companies').post(auth.verifyToken, userController.addUserCompany);
     app.route('/api/users/tags').post(auth.verifyToken, userController.addTags);
+
+    app.route('/api/user/recovery').post(userController.recoveryMail);
+    app.route('/api/user/recovery').put(userController.recoveryEditPassword);
 };

@@ -81,3 +81,19 @@ exports.addTags = function (req, res) {
         res.send(err);
     });
 };
+
+exports.recoveryMail = function (req, res) {
+    userModel.recoveryMail(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
+
+exports.recoveryEditPassword = function (req, res) {
+    userModel.recoveryEditPassword(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
