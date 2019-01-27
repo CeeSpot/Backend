@@ -306,7 +306,7 @@ module.exports = {
             config.con.query("SELECT email FROM users WHERE email = ?", [req.body.email] , function (err, res) {
                 if(res.length == 1){
                     let randomstring = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-                    let recoverylink = "http://localhost:8080/forgot-password-edit/"+ randomstring;
+                    let recoverylink = "http://localhost:8080/forgot-password-edit/user/"+ randomstring;
                     let message = "Uw recovery link is : " + recoverylink;
                     mailer.sendMail(res[0].email, "Recovery password CeeSpot", message);
                     con.query("UPDATE users SET recoverystring = ? WHERE email = ?", [randomstring, req.body.email], function (err, res) {

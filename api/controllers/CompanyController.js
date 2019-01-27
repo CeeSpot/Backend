@@ -40,3 +40,19 @@ exports.updateCompany = function (req, res) {
         res.send(err);
     })
 };
+
+exports.recoveryMail = function (req, res) {
+    companyModel.recoveryMail(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
+
+exports.recoveryEditPassword = function (req, res) {
+    companyModel.recoveryEditPassword(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
