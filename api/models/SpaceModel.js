@@ -111,7 +111,8 @@ module.exports = {
                     } else {
                         resolve({
                             success: true,
-                            data: res,
+                              insertId: res.insertId,
+                              data: res,
                             authorised: true
                         });
                     }

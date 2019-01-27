@@ -135,6 +135,7 @@ module.exports = {
                         resolve({
                             success: true,
                             authorised: true,
+                            insertId: res.insertId,
                             data: 'Succesfully added your event'
                         });
                     }

@@ -7,7 +7,6 @@ exports.fileUpload = function (req, res, file) {
   let type = req.body.type;
   let id   = req.body.id;
 
-
   switch(type) {
     case "spaces" :
       // add to db
@@ -16,16 +15,21 @@ exports.fileUpload = function (req, res, file) {
 
       break;
     case "spaces_header" :
-
       break;
     case "profile" :
-
       break;
     case 'blogs_header' :
       break;
     case 'blogs' :
       break;
+    case 'event' :
+      break;
+    case 'company' :
+      break;
+    case 'home_community' :
+      break;
     default:
+      // it MUST be in this list
       res.status(400);
       return res.send({success: false});
   }
