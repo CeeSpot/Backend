@@ -1,5 +1,21 @@
 let authorisationModel = require('../models/AuthorisationModel');
 
+exports.getRoles = function(req, res) {
+    authorisationModel.getRoles(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    })
+}
+
+exports.updateRole = function(req, res) {
+    authorisationModel.updateRole(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    })
+}
+
 exports.isLoggedIn = function (req, res) {
     authorisationModel.isLoggedIn(req.user).then(function (data) {
         res.send(data);

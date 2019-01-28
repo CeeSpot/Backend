@@ -7,6 +7,8 @@ module.exports = function (app) {
     // example Routes
     // app.route('/api/users/tags').post(auth.verifyToken, userController.addTags);
     app.route('/api/auth/users/isLoggedIn').get(auth.verifyToken, authorisationController.isLoggedIn);
+    app.route('/api/auth/users/roles').get(auth.verifyToken, authorisationController.getRoles);
+    app.route('/api/auth/users/roles').put(auth.verifyToken, authorisationController.updateRole);
     app.route('/api/auth/users/isAdmin').get(auth.verifyToken, authorisationController.isAdminLoggedIn);
     app.route('/api/auth/users/profilemanagement').get(auth.verifyToken, authorisationController.allowProfileManagement);
 

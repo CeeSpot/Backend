@@ -84,6 +84,7 @@ function updateUser(data, id, me = false) {
     delete data.isPartner;
     delete data.isStandardUser;
     delete data.isAdmin;
+    delete data.id
 
     return new Promise(function (resolve, reject) {
         config.con.query("UPDATE users SET ? where id = ?", [data, id], function (err, res) {

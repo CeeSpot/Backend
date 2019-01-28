@@ -30,7 +30,7 @@ function verifyToken(req, res, next) {
         }
     });
 }
-function verifyFunctionToken(req, optional = false) {
+function verifyFunctionToken(req, optional = false, adminNeeded = false) {
     return new Promise(function (resolve, reject) {
         let token = req.headers['x-access-token'];
         if((typeof token === 'undefined') || (token === null)){

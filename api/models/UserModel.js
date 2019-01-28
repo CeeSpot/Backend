@@ -159,7 +159,7 @@ module.exports = {
                 if (results.length === 0) {
                     reject({success: false, data: "No users found"});
                 } else {
-                    let user = entities.getJsonObjectFromDatabaseObject(results[0], {password: true, username: true});
+                    let user = entities.getJsonObjectFromDatabaseObject(results[0], {password: true, username: false});
                     config.con.query(`SELECT user_companies.id, user_companies.company_id, companies.name, companies.description, user_companies.role
                                        FROM user_companies 
                                        INNER JOIN companies ON user_companies.company_id = companies.id 
@@ -172,16 +172,26 @@ module.exports = {
                                 user.companies.push(entities.getJsonObjectFromDatabaseObject(i));
                             });
                         }
-                        SocialMediaEntities.getResourceSocialMediaSites(userid, enums.socialMediaRoles.SOCIAL_MEDIA_USER).then((data) => {
-                            user.social_media_sites = data;
-                            self.getUserTagsById(userid).then((userTags) => {
-                                user.tags = userTags.data;
-                                resolve({
-                                    success: true,
-                                    user: user
-                                });
-                            })
-                        })
+                        config.con.query(`SELECT user_role_id from user_user_roles WHERE user_id = ?`, [userid], function(err,res) {
+                            if(err) {
+                                reject({
+                                    success: false,
+                                    data: "Failed to get role"
+                                })
+                            } else {
+                                user.user_role_id = res[0].user_role_id
+                                SocialMediaEntities.getResourceSocialMediaSites(userid, enums.socialMediaRoles.SOCIAL_MEDIA_USER).then((data) => {
+                                    user.social_media_sites = data;
+                                    self.getUserTagsById(userid).then((userTags) => {
+                                        user.tags = userTags.data;
+                                        resolve({
+                                            success: true,
+                                            user: user
+                                        });
+                                    })
+                                })
+                            }
+                        });
                     });
                 }
             });
@@ -230,6 +240,7 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             if (req.user.id === req.body.user.id || req.user.isAdmin) {
                 userEntities.getUserByUsername(req.body.user.username).then((resp) => {
+                    console.log(resp)
                     if (!resp.success) reject(resp);
                     userEntities.updateUser(req.body.user, req.user.id, req.user.id === req.body.user.id).then((updatedUserResp) => {
                         resolve(updatedUserResp);
@@ -237,9 +248,11 @@ module.exports = {
                         reject(err)
                     });
                 }).catch((err) => {
+                    console.log('err: ' + err.toString())
                     reject({success: false, data: "Username doesnt exist"});
                 })
             } else {
+                console.log("well fuck")
                 reject({
                     success: false,
                     data: 'You are not authorised to update this user'
