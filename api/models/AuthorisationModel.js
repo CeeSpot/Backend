@@ -1,5 +1,7 @@
 let companyEntities = require('./Entities/CompanyEntities');
 let userEntities = require('./Entities/UserEntities');
+let config = require('../config');
+
 module.exports = {
     isLoggedIn: function(user) {
         return new Promise((resolve, reject) => {
@@ -7,6 +9,58 @@ module.exports = {
                 success:true,
                 authorised: true
             })
+        })
+    },
+    getRoles: function(req) {
+        return new Promise((resolve, reject) => {
+            if(req.user.isAdmin) {
+                config.con.query(`SELECT * from resource_roles WHERE id != 1500`, function(err,res) {
+                    if(err) {
+                        reject({
+                            success: false,
+                            authorised: true,
+                            data: "Something went wrong getting user roles"
+                        })
+                    } else {
+                        resolve({
+                            success: true,
+                            authorised: true,
+                            data: res
+                        })
+                    }
+                })
+            } else {
+                reject({
+                    success: false,
+                    authorised: false,
+                })
+            }
+        })
+    },
+    updateRole: function (req) {
+        return new Promise((resolve, reject) => {
+            if(req.user.isAdmin) {
+                config.con.query(`UPDATE user_user_roles SET user_role_id = ? WHERE user_id = ?`, [req.body.data.role, req.body.data.id], function(err, res) {
+                    if(err) {
+                        reject({
+                            success: false,
+                            authorised: true,
+                            data: "Something went wrong updating the user role"
+                        })
+                    } else {
+                        resolve({
+                            success: true,
+                            authorised: true,
+                            data: "Successfully updated user role"
+                        })
+                    }
+                })
+            } else {
+                reject({
+                    success: false,
+                    authorised: false,
+                })
+            }
         })
     },
     isAdminLoggedIn: function (user) {

@@ -8,7 +8,7 @@ let CompanyEntities = require('./Entities/CompanyEntities');
 let entities = require('./Entities/Entities');
 
 var authorisationModel = require('../models/AuthorisationModel');
-
+let mailer = require('../Mailer');
 let encryptRounds = config.encryptRounds;
 
 module.exports = {
@@ -185,6 +185,56 @@ module.exports = {
                     authorised: false
                 })
             }
+        })
+    },
+    recoveryMail: function (req) {
+        return new Promise(function (resolve, reject) {
+            config.con.query("SELECT email FROM companies WHERE email = ?", [req.body.email] , function (err, res) {
+                if(res.length == 1){
+                    let randomstring = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                    let recoverylink = "http://localhost:8080/forgot-password-edit/company/"+ randomstring;
+                    let message = "Uw recovery link is : " + recoverylink;
+                    mailer.sendMail(res[0].email, "Recovery password CeeSpot", message);
+                    con.query("UPDATE companies SET recoverystring = ? WHERE email = ?", [randomstring, req.body.email], function (err, res) {
+                        resolve({
+                            success: true,
+                            data: 'Successfully send recovery mail!'
+                        });
+                    })
+                } else {
+                    resolve({
+                        success: false,
+                        data: 'No company found with this email!'
+                    });
+                }
+            })
+        })
+    },
+    recoveryEditPassword: function (req) {
+        return new Promise(function (resolve, reject) {
+            config.con.query("SELECT id FROM companies WHERE recoverystring = ?", [req.body.recoverystring] , function (err, res) {
+                if(res.length == 1){
+                    bcrypt.genSalt(config.encryptRounds, function (err, salt) { //generate a salt with rounds
+                        bcrypt.hash(req.body.newPassword, salt, function (err, hash) {
+                            if (err) {
+                                reject({success: false, data: "Something went wrong"});
+                            } else {
+                                con.query("UPDATE companies SET password = ?, recoverystring = '' WHERE id = ?", [hash, res[0].id], function (err, res) {
+                                    resolve({
+                                        success: true,
+                                        data: 'Successfully changed password!'
+                                    });
+                                })
+                            }
+                        });
+                    });
+                } else {
+                    resolve({
+                        success: false,
+                        data: 'No company recovery found!'
+                    });
+                }
+            })
         })
     }
 };

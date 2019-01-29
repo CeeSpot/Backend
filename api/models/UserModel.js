@@ -6,8 +6,10 @@ let entities = require('./Entities/Entities');
 let enums = require('../Enums');
 let SocialMediaModel = require('./SocialMediaModel');
 let SocialMediaEntities = require('./Entities/SocialMediaEntities');
-
+let mailer = require('../Mailer');
 let encryptRounds = config.encryptRounds;
+
+
 module.exports = {
     getUsers: function () {
         return new Promise(function (resolve, reject) {
@@ -157,12 +159,12 @@ module.exports = {
                 if (results.length === 0) {
                     reject({success: false, data: "No users found"});
                 } else {
-                    let user = entities.getJsonObjectFromDatabaseObject(results[0], {password: true, username: true});
+                    let user = entities.getJsonObjectFromDatabaseObject(results[0], {password: true, username: false});
                     config.con.query(`SELECT user_companies.id, user_companies.company_id, companies.name, companies.description, user_companies.role
                                        FROM user_companies 
                                        INNER JOIN companies ON user_companies.company_id = companies.id 
                                        WHERE user_companies.user_id = ?`, userid, function (err, res) {
-                        if (err) reject({success: false, data: err.toString()});
+                        if (err) reject({success: false, data:"Failed to get companies"});
                         if (res.length > 0) {
                             // Might have more than one company associated, thus return all of them
                             user.companies = [];
@@ -170,16 +172,26 @@ module.exports = {
                                 user.companies.push(entities.getJsonObjectFromDatabaseObject(i));
                             });
                         }
-                        SocialMediaEntities.getResourceSocialMediaSites(userid, enums.socialMediaRoles.SOCIAL_MEDIA_USER).then((data) => {
-                            user.social_media_sites = data;
-                            self.getUserTagsById(userid).then((userTags) => {
-                                user.tags = userTags.data;
-                                resolve({
-                                    success: true,
-                                    user: user
-                                });
-                            })
-                        })
+                        config.con.query(`SELECT user_role_id from user_user_roles WHERE user_id = ?`, [userid], function(err,res) {
+                            if(err) {
+                                reject({
+                                    success: false,
+                                    data: "Failed to get role"
+                                })
+                            } else {
+                                user.user_role_id = res[0].user_role_id
+                                SocialMediaEntities.getResourceSocialMediaSites(userid, enums.socialMediaRoles.SOCIAL_MEDIA_USER).then((data) => {
+                                    user.social_media_sites = data;
+                                    self.getUserTagsById(userid).then((userTags) => {
+                                        user.tags = userTags.data;
+                                        resolve({
+                                            success: true,
+                                            user: user
+                                        });
+                                    })
+                                })
+                            }
+                        });
                     });
                 }
             });
@@ -193,7 +205,6 @@ module.exports = {
                                INNER JOIN companies ON user_companies.company_id = companies.id 
                                WHERE user_companies.user_id = ?`, req.user.id, function (err, res) {
                 if (err) {
-                    console.log(err.toString());
                     reject({success: false, user: "Something went wrong"});
                 }
                 req.user.mailVis = req.user.mailVis === 1;
@@ -232,15 +243,16 @@ module.exports = {
                     console.log(resp)
                     if (!resp.success) reject(resp);
                     userEntities.updateUser(req.body.user, req.user.id, req.user.id === req.body.user.id).then((updatedUserResp) => {
-                        console.log(updatedUserResp)
                         resolve(updatedUserResp);
                     }).catch((err) => {
                         reject(err)
                     });
                 }).catch((err) => {
+                    console.log('err: ' + err.toString())
                     reject({success: false, data: "Username doesnt exist"});
                 })
             } else {
+                console.log("well fuck")
                 reject({
                     success: false,
                     data: 'You are not authorised to update this user'
@@ -254,20 +266,15 @@ module.exports = {
                 let user_id = req.body.user_id;
                 config.con.query("DELETE FROM users WHERE id = ?", [user_id], function (err, res) {
                     if (err) {
-                        console.log("hi there, this went wrong")
                         reject({
                             success: false,
                             data: "Failed to delete user"
                         })
                     } else {
                         SocialMediaEntities.deleteResourceRecordsForUser(req.user.id).then(() => {
-                            console.log("came here")
                             userEntities.deleteUserRole(req.user.id).then(() => {
-                                console.log("came here")
                                 userEntities.deleteUserCompanyRoles(req.user.id).then(() => {
-                                    console.log("came here")
                                     userEntities.deleteUserTags(req.user.id).then(() => {
-                                        console.log("came here")
                                         resolve({
                                             success: true,
                                             data: "Successfully deleted user"
@@ -285,15 +292,15 @@ module.exports = {
         return new Promise((resolve, reject) => {
             userEntities.insertAndUpdateUserRoles(req.user, req.body).then((data) => {
                 userEntities.deleteUserCompanies(req.body).then((data) => {
-                    resolve({success: false, data: 'Successfully updated the company roles of your user account'})
+                    resolve({success: true, data: 'Successfully updated the company roles of your user account'})
                 }).catch((err) => {
-                    resolve({success: false, data: 'Successfully updated the company roles of your user account'})
+                    resolve({success: false, data: 'Failed to delete company roles but succesfully updated of your user account'})
                 })
             }).catch((err) => {
                 userEntities.deleteUserCompanies(req.body).then((data) => {
-                    resolve({success: false, data: 'Successfully updated the company roles of your user account'})
+                    resolve({success: false, data: 'Failed to update/insert the company roles of your user account but successfully deleted any.'})
                 }).catch((err) => {
-                    resolve({success: false, data: 'Successfully updated the company roles of your user account'})
+                    resolve({success: false, data: 'Failed to insert/update/delete company roles of your user account'})
                 })
             })
         })
@@ -305,6 +312,56 @@ module.exports = {
                     resolve({success: false, data: 'Successfully updated your user account'})
                 })
             });
+        })
+    },
+    recoveryMail: function (req) {
+        return new Promise(function (resolve, reject) {
+            config.con.query("SELECT email FROM users WHERE email = ?", [req.body.email] , function (err, res) {
+                if(res.length == 1){
+                    let randomstring = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                    let recoverylink = "http://localhost:8080/forgot-password-edit/user/"+ randomstring;
+                    let message = "Uw recovery link is : " + recoverylink;
+                    mailer.sendMail(res[0].email, "Recovery password CeeSpot", message);
+                    con.query("UPDATE users SET recoverystring = ? WHERE email = ?", [randomstring, req.body.email], function (err, res) {
+                        resolve({
+                            success: true,
+                            data: 'Successfully send recovery mail!'
+                        });
+                    })
+                } else {
+                    resolve({
+                        success: false,
+                        data: 'No user found with this email!'
+                    });
+                }
+            })
+        })
+    },
+    recoveryEditPassword: function (req) {
+        return new Promise(function (resolve, reject) {
+            config.con.query("SELECT id FROM users WHERE recoverystring = ?", [req.body.recoverystring] , function (err, res) {
+                if(res.length == 1){
+                    bcrypt.genSalt(config.encryptRounds, function (err, salt) { //generate a salt with rounds
+                        bcrypt.hash(req.body.newPassword, salt, function (err, hash) {
+                            if (err) {
+                                reject({success: false, data: "Something went wrong"});
+                            } else {
+                                con.query("UPDATE users SET password = ?, recoverystring = '' WHERE id = ?", [hash, res[0].id], function (err, res) {
+                                    resolve({
+                                        success: true,
+                                        data: 'Successfully changed password!'
+                                    });
+                                })
+                            }
+                        });
+                    });
+                } else {
+                    resolve({
+                        success: false,
+                        data: 'No account recovery found!'
+                    });
+                }
+            })
         })
     }
 };

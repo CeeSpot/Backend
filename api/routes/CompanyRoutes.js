@@ -10,4 +10,7 @@ module.exports = function (app) {
 
     app.route('/api/companies/me').get(auth.verifyToken, companyController.me);
     app.route('/api/companies/update').put(auth.verifyToken, companyController.updateCompany);
+
+    app.route('/api/company/recovery').post(companyController.recoveryMail);
+    app.route('/api/company/recovery').put(companyController.recoveryEditPassword);
 };

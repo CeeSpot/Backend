@@ -67,7 +67,6 @@ function authenticate(req){
  * @returns {Promise<any>}
  */
 function updateUser(data, id, me = false) {
-    let self = this;
     data.mailVis = data.mailVis ? 1 : 0;
     data.addressVis = data.addressVis ? 1 : 0;
     data.birthdateVis = data.birthdateVis ? 1 : 0;
@@ -85,6 +84,7 @@ function updateUser(data, id, me = false) {
     delete data.isPartner;
     delete data.isStandardUser;
     delete data.isAdmin;
+    delete data.id
 
     return new Promise(function (resolve, reject) {
         config.con.query("UPDATE users SET ? where id = ?", [data, id], function (err, res) {
