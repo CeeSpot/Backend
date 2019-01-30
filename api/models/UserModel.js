@@ -94,7 +94,12 @@ module.exports = {
                                 // Insert the new user
                                 config.con.query('INSERT INTO users SET ?', post, function (err, res) {
                                     if (err) {
-                                        reject({success: false, data: "Failed to insert user"});
+                                        console.log(err.code);
+                                        if(err.code){
+                                            reject({success: false, data: "A user with this e-mailadres already exists"});
+                                        } else {
+                                            reject({success: false, data: "Failed to insert user"});
+                                        }
                                     } else {
                                         let user_id = res.insertId;
                                         let user_user_role_insert = {
