@@ -1,7 +1,7 @@
 'use strict';
 var config = require('../config');
 var authorisationModel = require('../models/AuthorisationModel');
-
+var moment = require('moment');
 module.exports = {
     getSpaces: function (req) {
         return new Promise(function (resolve, reject) {
@@ -147,21 +147,34 @@ module.exports = {
         return new Promise(function (resolve, reject) {
             authorisationModel.allowSpaceBookingNoConfirm(req.user).then((resp) => {
                 req.body.reservation.approved = resp.noconfirm ? 1 : 0
-                con.query("INSERT INTO space_reservations SET ?", [req.body.reservation], function (err, res) {
-                    if (err) {
-                        reject({
-                            success: false,
-                            data: "Failed to add booking",
-                            authorised: true
-                        })
-                    } else {
-                        resolve({
-                            success: true,
-                            data: res,
-                            authorised: true
-                        });
-                    }
-                })
+                let start = moment(req.body.reservation.start, 'hh:mm')
+                let end = moment(req.body.reservation.end, 'hh:mm')
+                if (start.isBefore(end)) {
+                    req.body.reservation.start =moment(req.body.reservation.start).format('HH:mm')
+                    req.body.reservation.end =moment(req.body.reservation.end).format('HH:mm')
+                    con.query("INSERT INTO space_reservations SET ?", [req.body.reservation], function (err, res) {
+                        if (err) {
+                            console.log(err.toString())
+                            reject({
+                                success: false,
+                                data: "Failed to add booking",
+                                authorised: true
+                            })
+                        } else {
+                            resolve({
+                                success: true,
+                                data: res,
+                                authorised: true
+                            });
+                        }
+                    })
+                } else {
+                    reject({
+                        success: false,
+                        authorised: true,
+                        data: "Start must be before end"
+                    })
+                }
             }).catch(() => {
                 reject({
                     success: false,

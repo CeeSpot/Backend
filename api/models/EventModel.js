@@ -123,23 +123,39 @@ module.exports = {
     addEvent: function (req) {
         return new Promise(function (resolve, reject) {
             authorisationModel.allowEventBookingNoConfirm(req.user).then((resp) => {
-                req.body.event.approved = resp.noconfirm ? 1 : 0;
-                con.query("INSERT INTO events SET ?", [req.body.event], function (err, res) {
-                    if (err) {
+                if (typeof req.body.event.start !== 'undefined' && typeof req.body.event.end !== 'undefined') {
+                    if (moment(req.body.event.start).isBefore(moment(req.body.event.end))) {
+                        config.con.query("INSERT INTO events SET ?", [req.body.event], function (err, res) {
+                            if (err) {
+                                console.log(err.toString())
+                                reject({
+                                    success: false,
+                                    authorised: true,
+                                    data: 'Failed to insert event'
+                                })
+                            } else {
+                                resolve({
+                                    success: true,
+                                    authorised: true,
+                                    insertId: res.insertId,
+                                    data: 'Succesfully added your event'
+                                });
+                            }
+                        })
+                    } else {
                         reject({
                             success: false,
                             authorised: true,
-                            data: 'Failed to insert event'
+                            data: "Start must be before end"
                         })
-                    } else {
-                        resolve({
-                            success: true,
-                            authorised: true,
-                            insertId: res.insertId,
-                            data: 'Succesfully added your event'
-                        });
                     }
-                })
+                } else {
+                    reject({
+                        success: false,
+                        authorised: true,
+                        data: "Please fill in the required form correctly"
+                    })
+                }
             }).catch(() => {
                 reject({
                     success: false,
