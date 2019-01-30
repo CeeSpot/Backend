@@ -12,7 +12,7 @@ module.exports = function (app) {
     app.route('/api/ical/events').get(eventController.getAllEventsiCal); //done
 
     app.route('/api/events/add').post(auth.verifyToken, eventController.addEvent); //done
-    app.route('/api/events/delete').delete(auth.verifyToken, eventController.deleteEvent); //done
+    app.route('/api/events/delete/:event_id').delete(auth.verifyToken, eventController.deleteEvent); //done
     app.route('/api/events/update').put(auth.verifyToken, eventController.updateEvent); //done
 
     app.route('/api/events/userevent').post(auth.verifyToken, eventController.addUserEvent); //done

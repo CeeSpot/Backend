@@ -81,8 +81,7 @@ exports.deleteEvent = function (req, res) {
     eventModel.deleteEvent(req).then(function (data) {
         console.log(data);
         if (data.success){
-            eventModel.deleteAllEventUsers(data.event_id).then(function (data) {
-                console.log(data);
+            eventModel.deleteAllEventUsers(req,req.params.event_id).then(function (data) {
                 res.send(data);
             }).catch(function (err) {
                 console.log(err);
