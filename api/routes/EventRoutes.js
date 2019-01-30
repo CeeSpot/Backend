@@ -6,6 +6,7 @@ module.exports = function (app) {
     // example Routes
     app.route('/api/events').get(eventController.getEvents); //done
     app.route('/api/events/upcoming').get(eventController.getUpcomingEvents); // done
+    app.route('/api/events/past').get(eventController.getPastEvents); // done
     app.route('/api/event/:event_id').get(eventController.getEvent); //done
     app.route('/api/events/categories').get(eventController.getEventCategories); //done
     app.route('/api/ical/events/:event_id').get(eventController.getEventiCal); //done

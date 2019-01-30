@@ -174,3 +174,11 @@ exports.updateRequestState = function (req, res) {
     });
 };
 
+exports.getPastEvents = function (req, res) {
+    eventModel.getPastEvents(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
+

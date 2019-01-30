@@ -41,7 +41,7 @@ module.exports = {
         let today = moment().startOf('day').format('YYYY-MM-DD HH:mm:ss');
 
         return new Promise(function (resolve, reject) {
-            con.query("SELECT * FROM events WHERE start > ? ORDER BY start ASC LIMIT 3", [today], function (err, res) {
+            con.query("SELECT * FROM events WHERE start > ? ORDER BY start", [today], function (err, res) {
                 if (err) {
                     console.log(err)
                     reject({
@@ -367,5 +367,24 @@ module.exports = {
                 })
             }
         })
+    },
+    getPastEvents: function () {
+        let today = moment().startOf('day').format('YYYY-MM-DD HH:mm:ss');
+        return new Promise(function (resolve, reject) {
+            con.query("SELECT * FROM events WHERE start < ? ORDER BY start", [today], function (err, res) {
+                if (err) {
+                    console.log(err)
+                    reject({
+                        success: false,
+                        data: "Failed to get events."
+                    })
+                } else {
+                    resolve({
+                        success: true,
+                        data: res
+                    });
+                }
+            })
+        });
     }
 };
