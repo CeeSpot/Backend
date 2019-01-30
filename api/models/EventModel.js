@@ -166,7 +166,6 @@ module.exports = {
     },
     deleteEvent: function (req) {
         return new Promise(function (resolve, reject) {
-            console.log(req)
             if (req.user.isAdmin) {
                 con.query("DELETE FROM `events` WHERE id = ?", [
                     req.params.event_id
