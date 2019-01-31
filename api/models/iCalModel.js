@@ -1,5 +1,5 @@
 var moment = require('moment');
-let path = 'C:/Users/micha/Desktop/icaltester/';
+let path = '././static/ical/';
 
 module.exports = {
     /** Update ICS-file with all events */
@@ -76,6 +76,7 @@ function createEventsICS(){
             console.log(error);
             return false;
         }
+        //console.log(value);
 
         writeFileSync(path + `events.ics`, value);
         return true;
