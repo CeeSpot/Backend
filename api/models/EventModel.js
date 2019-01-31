@@ -41,7 +41,7 @@ module.exports = {
         let today = moment().startOf('day').format('YYYY-MM-DD HH:mm:ss');
 
         return new Promise(function (resolve, reject) {
-            con.query("SELECT * FROM events WHERE start > ? ORDER BY start ASC LIMIT 3", [today], function (err, res) {
+            con.query("SELECT * FROM events WHERE start > ? ORDER BY start", [today], function (err, res) {
                 if (err) {
                     console.log(err)
                     reject({
@@ -123,23 +123,39 @@ module.exports = {
     addEvent: function (req) {
         return new Promise(function (resolve, reject) {
             authorisationModel.allowEventBookingNoConfirm(req.user).then((resp) => {
-                req.body.event.approved = resp.noconfirm ? 1 : 0;
-                con.query("INSERT INTO events SET ?", [req.body.event], function (err, res) {
-                    if (err) {
+                if (typeof req.body.event.start !== 'undefined' && typeof req.body.event.end !== 'undefined') {
+                    if (moment(req.body.event.start).isBefore(moment(req.body.event.end))) {
+                        config.con.query("INSERT INTO events SET ?", [req.body.event], function (err, res) {
+                            if (err) {
+                                console.log(err.toString())
+                                reject({
+                                    success: false,
+                                    authorised: true,
+                                    data: 'Failed to insert event'
+                                })
+                            } else {
+                                resolve({
+                                    success: true,
+                                    authorised: true,
+                                    insertId: res.insertId,
+                                    data: 'Succesfully added your event'
+                                });
+                            }
+                        })
+                    } else {
                         reject({
                             success: false,
                             authorised: true,
-                            data: 'Failed to insert event'
+                            data: "Start must be before end"
                         })
-                    } else {
-                        resolve({
-                            success: true,
-                            authorised: true,
-                            insertId: res.insertId,
-                            data: 'Succesfully added your event'
-                        });
                     }
-                })
+                } else {
+                    reject({
+                        success: false,
+                        authorised: true,
+                        data: "Please fill in the required form correctly"
+                    })
+                }
             }).catch(() => {
                 reject({
                     success: false,
@@ -151,8 +167,8 @@ module.exports = {
     deleteEvent: function (req) {
         return new Promise(function (resolve, reject) {
             if (req.user.isAdmin) {
-                con.query("DELETE FROM events WHERE id = ?", [
-                    req.body.event_id
+                con.query("DELETE FROM `events` WHERE id = ?", [
+                    req.params.event_id
                 ], function (err, res) {
                     if (err) {
                         reject({
@@ -163,7 +179,7 @@ module.exports = {
                     } else {
                         resolve({
                             success: true,
-                            event_id: req.body.event_id,
+                            event_id: req.params.event_id,
                             authorised: true
                         });
                     }
@@ -176,10 +192,10 @@ module.exports = {
             }
         })
     },
-    deleteAllEventUsers: function (event_id) {
+    deleteAllEventUsers: function (req, event_id) {
         return new Promise(function (resolve, reject) {
             if (req.user.isAdmin) {
-                con.query("DELETE FROM user_events WHERE event_id = ?", [
+                config.con.query("DELETE FROM user_events WHERE event_id = ?", [
                     event_id
                 ], function (err, res) {
                     if (err) {
@@ -351,5 +367,24 @@ module.exports = {
                 })
             }
         })
+    },
+    getPastEvents: function () {
+        let today = moment().startOf('day').format('YYYY-MM-DD HH:mm:ss');
+        return new Promise(function (resolve, reject) {
+            con.query("SELECT * FROM events WHERE start < ? ORDER BY start", [today], function (err, res) {
+                if (err) {
+                    console.log(err)
+                    reject({
+                        success: false,
+                        data: "Failed to get events."
+                    })
+                } else {
+                    resolve({
+                        success: true,
+                        data: res
+                    });
+                }
+            })
+        });
     }
 };

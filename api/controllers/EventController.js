@@ -81,8 +81,7 @@ exports.deleteEvent = function (req, res) {
     eventModel.deleteEvent(req).then(function (data) {
         console.log(data);
         if (data.success){
-            eventModel.deleteAllEventUsers(data.event_id).then(function (data) {
-                console.log(data);
+            eventModel.deleteAllEventUsers(req,req.params.event_id).then(function (data) {
                 res.send(data);
             }).catch(function (err) {
                 console.log(err);
@@ -169,6 +168,14 @@ exports.getRequestsEvents = function (req, res) {
 
 exports.updateRequestState = function (req, res) {
     eventModel.updateRequestState(req).then(function (data) {
+        res.send(data);
+    }).catch(function (err) {
+        res.send(err);
+    });
+};
+
+exports.getPastEvents = function (req, res) {
+    eventModel.getPastEvents(req).then(function (data) {
         res.send(data);
     }).catch(function (err) {
         res.send(err);
