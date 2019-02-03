@@ -7,7 +7,7 @@
 #
 # Host: 194.145.201.29 (MySQL 5.7.24-0ubuntu0.18.04.1)
 # Database: the_cee_database
-# Generation Time: 2019-01-30 12:26:07 +0000
+# Generation Time: 2019-02-03 18:15:28 +0000
 # ************************************************************
 
 
@@ -30,7 +30,7 @@ CREATE TABLE `blog_tags` (
   `blog_id` int(11) NOT NULL,
   `blogs_tags_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=76 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `blog_tags` WRITE;
 /*!40000 ALTER TABLE `blog_tags` DISABLE KEYS */;
@@ -61,8 +61,7 @@ VALUES
 	(71,51,2),
 	(72,54,5),
 	(73,55,3),
-	(74,1,2),
-	(75,1,1);
+	(74,1,2);
 
 /*!40000 ALTER TABLE `blog_tags` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -82,34 +81,14 @@ CREATE TABLE `blogs` (
   `body` longtext NOT NULL,
   `date_created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `blogs` WRITE;
 /*!40000 ALTER TABLE `blogs` DISABLE KEYS */;
 
 INSERT INTO `blogs` (`id`, `title`, `description`, `picture`, `author`, `body`, `date_created`)
 VALUES
-	(1,'What Is Growth Marketing?','Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.','test','1','<p>Growth is een veel genoemd begrip binnen het bedrijfsleven. Vooral startups hebben belang bij snelle groei van hun nieuwe bedrijf. Begrippen zoals growth hacking, growth marketing en online marketing worden ingezet om snelle groei (growth) te bereiken.</p><p>\n</p><p><strong>Zoekmachine adverteren.</strong></p>','2019-01-09 23:37:58'),
-	(2,'Test 1','Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.','test','1','Blablabla','2019-01-09 23:37:58'),
-	(3,'Test 2','Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.','test','1','Blablabla','2019-01-09 23:37:58'),
-	(4,'Test 3','Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.','test','1','Blablabla','2019-01-09 23:37:58'),
-	(5,'Test 4','Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.','test','1','Blablabla','2019-01-09 23:37:58'),
-	(6,'Test 5','Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.','test','1','Blablabla','2019-01-09 23:37:58'),
-	(7,'Test 6','Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.','test','1','Blablabla','2019-01-09 23:37:58'),
-	(20,'Michael','Brown',NULL,NULL,'<p>test</p>','2019-01-16 11:58:45'),
-	(21,'bla','die bla',NULL,NULL,'<p>e</p>','2019-01-16 12:28:07'),
-	(22,'Tag test','Test',NULL,NULL,'<p>test</p>','2019-01-16 12:50:16'),
-	(36,'nice','nice',NULL,NULL,'<p><s>nice</s></p>','2019-01-18 10:25:42'),
-	(37,'nice','nice',NULL,NULL,'<p>nice</p>','2019-01-18 10:26:56'),
-	(38,'Kylian','Is sick lijp',NULL,NULL,'<p>Test</p>','2019-01-18 12:16:29'),
-	(39,'Hello','he',NULL,NULL,'<p>e</p>','2019-01-18 12:19:03'),
-	(40,'titel','desc',NULL,NULL,'<p>test</p>','2019-01-18 12:30:09'),
-	(41,'test','test',NULL,NULL,'<p>eee</p>','2019-01-18 12:40:03'),
-	(42,'eeee','e',NULL,NULL,'<p>aefea</p>','2019-01-18 12:57:59'),
-	(50,'Test','te',NULL,NULL,'<p>Test</p>','2019-01-25 12:48:02'),
-	(51,'Test','Test',NULL,NULL,'<h1><strong>Test</strong></h1>','2019-01-25 16:41:36'),
-	(54,'Presentatie CSPOT','lorem ipsum',NULL,NULL,'<p>Presentatie bij de cspot</p>','2019-01-29 09:23:35'),
-	(55,'Test2','Test2',NULL,NULL,'<p>Test2</p>','2019-01-29 09:24:03');
+	(1,'What Is Growth Marketing?','Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.','test','1','<p>Growth is een veel genoemd begrip binnen het bedrijfsleven. Vooral startups hebben belang bij snelle groei van hun nieuwe bedrijf. Begrippen zoals growth hacking, growth marketing en online marketing worden ingezet om snelle groei (growth) te bereiken.</p><p>\n</p><p><strong>Zoekmachine adverteren.</strong></p>','2019-01-09 23:37:58');
 
 /*!40000 ALTER TABLE `blogs` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -124,7 +103,7 @@ CREATE TABLE `blogs_tags` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `blogs_tags` WRITE;
 /*!40000 ALTER TABLE `blogs_tags` DISABLE KEYS */;
@@ -163,7 +142,7 @@ CREATE TABLE `companies` (
   `recoverystring` text,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `companies` WRITE;
 /*!40000 ALTER TABLE `companies` DISABLE KEYS */;
@@ -190,7 +169,7 @@ CREATE TABLE `companies_tags` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `description` varchar(30) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `companies_tags` WRITE;
 /*!40000 ALTER TABLE `companies_tags` DISABLE KEYS */;
@@ -217,7 +196,7 @@ CREATE TABLE `company_tags` (
   `company_id` int(11) DEFAULT NULL,
   `tag_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `company_tags` WRITE;
 /*!40000 ALTER TABLE `company_tags` DISABLE KEYS */;
@@ -240,7 +219,7 @@ CREATE TABLE `event_categories` (
   `text` varchar(150) DEFAULT NULL,
   `value` varchar(150) DEFAULT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `event_categories` WRITE;
 /*!40000 ALTER TABLE `event_categories` DISABLE KEYS */;
@@ -275,14 +254,14 @@ CREATE TABLE `events` (
   `location_city` varchar(100) NOT NULL,
   `approved` tinyint(4) DEFAULT '1',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `events` WRITE;
 /*!40000 ALTER TABLE `events` DISABLE KEYS */;
 
 INSERT INTO `events` (`id`, `title`, `category`, `description`, `small_description`, `start`, `end`, `picture`, `location_name`, `show_attendees`, `location_address`, `location_postalcode`, `location_city`, `approved`)
 VALUES
-	(45,'Fris trendseminar ‘Digital & Retail Revolution in China’',NULL,'Stichting Fris, Trimm, Nextport China en Chinatalk nodigen je uit voor het trendseminar \'Digital & Retail Revolution in China’ op 5 februari aanstaande.\n\nHet kennis evenement voor wie meer wil weten over de mogelijkheden van zaken doen in China en de werking van online marketing. We beginnen de avond met een quick dinner zodat je met gevulde maag aan het seminar kunt deelnemen (en dus meteen vanuit kantoor kunt komen :)\n\nDatum: 5 februari\nLocatie: Trimm, Moutlaan 25, Enschede (route)\nStart quick dinner: 18:00\nStart programma: 18:30\nAfsluiting en borrel: ca. 21:00\nAanmelden: Eventbrite\n\nWist je dat China binnen 10 jaar is uitgegroeid tot de grootste aandeelhouder (40%) in de wereldwijde e-commerce markt? China deskundige Ed Sander neemt je mee in de trends en ontwikkelingen op het gebied van digital en retail.','Stichting Fris, Trimm, Nextport China en Chinatalk nodigen je uit voor het trendseminar \'Digital & Retail Revolution in China’ op 5 februari aanstaande.','2019-02-05 18:00:00','2019-02-05 21:00:00',NULL,'TRIMM',1,'Moutlaan 25','7523MC','Enschede',1),
+	(45,'Fris trendseminar ‘Digital & Retail Revolution in China’',NULL,'Stichting Fris, Trimm, Nextport China en Chinatalk nodigen je uit voor het trendseminar \'Digital & Retail Revolution in China’ op 5 februari aanstaande.\n\nHet kennis evenement voor wie meer wil weten over de mogelijkheden van zaken doen in China en de werking van online marketing. We beginnen de avond met een quick dinner zodat je met gevulde maag aan het seminar kunt deelnemen (en dus meteen vanuit kantoor kunt komen :)\n\nDatum: 5 februari\nLocatie: Trimm, Moutlaan 25, Enschede (route)\nStart quick dinner: 18:00\nStart programma: 18:30\nAfsluiting en borrel: ca. 21:00\nAanmelden: Eventbrite\n\nWist je dat China binnen 10 jaar is uitgegroeid tot de grootste aandeelhouder (40%) in de wereldwijde e-commerce markt? China deskundige Ed Sander neemt je mee in de trends en ontwikkelingen op het gebied van digital en retail.','Stichting Fris, Trimm, Nextport China en Chinatalk nodigen je uit voor het trendseminar \'Digital & Retail Revolution in China’ op 5 februari aanstaande.','2019-01-05 18:00:00','2019-01-05 21:00:00',NULL,'TRIMM',1,'Moutlaan 25','7523MC','Enschede',1),
 	(46,'Enschede School of AI',NULL,'5th monthly meetup. See schedule for details.','5th monthly meetup. See schedule for details.','2019-02-07 06:30:00','2019-02-07 08:30:00',NULL,'The CeeSpot',1,'Brouwerijstraat 1','7523 XC','Enschede',1),
 	(47,'LightBulb Chats: Designer Babies',NULL,'In the second edition of DesignLab’s LightBulb Chats we explore gene editing in humans: the possibilities, the dangers, the grey areas. All info & registration https://www.utwente.nl/en/designlab/events/!/2019/2/133333/lightbulb-chats-designer-babies\n\nThe world’s first designer babies, babies that have been genetically modified, were (purportedly) born late last year. Is this the beginning of a new medical revolution? Are we a few steps away from becoming superhuman? Or, do designer babies widen the gap between the rich and the poor? Will baby girls become a rarity in countries with a cultural preference for boys?\n\nJoin the conversation!','In the second edition of DesignLab’s LightBulb Chats we explore gene editing in humans: the possibilities, the dangers, the grey areas.','2019-02-12 17:30:00','2019-02-12 19:30:00',NULL,'DesignLab UTwente',1,'Hengelosestraat 500','7521 AN','Enschede',1),
 	(48,'Beter presenteren kun je leren',NULL,'Wil jij je collega’s overtuigen van je ideeën? Je verkooppresentatie leuker en sprankelender maken? Spreektips krijgen die jouw presentaties verbeteren?\n\nBij Twente Toastmasters vind je een prettige plek om je presenteren te professionaliseren. Daar sta je voor een publiek dat klaar zit om jóu te helpen een betere presentator te worden. Een publiek dat precies begrijpt hoe je nu voor de groep staat, omdat de mensen in je publiek daar zelf een tijdje geleden precies zo stonden.\n\nOp deze avond kun je kijken hoe je kunt groeien als je onze leren-door-te-doen methode volgt. Zie met eigen ogen hoe je over een jaar zelf zult kunnen spreken. En kom er achter hoe je over een jaar zelf speeches en presentaties van anderen zult kunnen evalueren!\n\nVanaf 19.15 is er een inloop, en om 19.30 beginnen we met het programma, wat tot ongeveer 21.30 duurt. Nieuwsgierig? Kom vrijblijvend langs!','Wil jij je collega’s overtuigen van je ideeën? Je verkooppresentatie leuker en sprankelender maken? Spreektips krijgen die jouw presentaties verbeteren?','2019-02-26 19:15:00','2019-02-26 21:30:00',NULL,'The cee spot',1,'Brouwerijstraat 1','7523 XC','Enschede',1),
@@ -355,7 +334,7 @@ CREATE TABLE `settings` (
   `name` varchar(255) NOT NULL,
   `is_on` tinyint(2) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `settings` WRITE;
 /*!40000 ALTER TABLE `settings` DISABLE KEYS */;
@@ -377,7 +356,7 @@ CREATE TABLE `social_media` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `site` varchar(25) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `social_media` WRITE;
 /*!40000 ALTER TABLE `social_media` DISABLE KEYS */;
@@ -447,8 +426,17 @@ CREATE TABLE `space_reservations` (
   `approved` tinyint(4) DEFAULT NULL,
   `space_title` varchar(150) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+LOCK TABLES `space_reservations` WRITE;
+/*!40000 ALTER TABLE `space_reservations` DISABLE KEYS */;
+
+INSERT INTO `space_reservations` (`id`, `date`, `start`, `end`, `name`, `email`, `space_id`, `phone`, `member_id`, `approved`, `space_title`)
+VALUES
+	(37,'2019-01-31','09:16:00','20:16:00','Albert Einstein','password1@pass.com',19,'0612345678',NULL,1,'Green Room');
+
+/*!40000 ALTER TABLE `space_reservations` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table spaces
@@ -466,7 +454,7 @@ CREATE TABLE `spaces` (
   `targets` text NOT NULL,
   `facilities` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `spaces` WRITE;
 /*!40000 ALTER TABLE `spaces` DISABLE KEYS */;
@@ -495,7 +483,7 @@ CREATE TABLE `tags` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `description` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `tags` WRITE;
 /*!40000 ALTER TABLE `tags` DISABLE KEYS */;
@@ -522,7 +510,7 @@ CREATE TABLE `text` (
   `value_nl` longtext NOT NULL,
   `value_en` longtext NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `text` WRITE;
 /*!40000 ALTER TABLE `text` DISABLE KEYS */;
@@ -530,13 +518,13 @@ LOCK TABLES `text` WRITE;
 INSERT INTO `text` (`id`, `key`, `value_nl`, `value_en`)
 VALUES
 	(1,'about','<p>Over ons</p>','<p>About us</p>'),
-	(2,'book_a_tour','<p><span style=\"color: rgb(102, 102, 102);\">Do you want to see if working at the cee spot and being a part of the Creative Community ‘CeeCee’ is something for you? Please feel free to book a tour and try-out the cee spot! Just make an appointment with Bart-Jan for a tour or just drop by during office hours at Brouwerijstraat 1 in Enschede. On Fridays, you can make use of our facilities and services for free!</span></p>','<p><span style=\"color: rgb(102, 102, 102);\">Do you want to see if working at the cee spot and being a part of the Creative Community ‘CeeCee’ is something for you? Please feel free to book a tour and try-out the cee spot! Just make an appointment with Bart-Jan for a tour or just drop by during office hours at Brouwerijstraat 1 in Enschede. On Fridays, you can make use of our facilities and services for free!</span></p>'),
-	(3,'community','<p><span style=\"color: rgb(102, 102, 102);\">Our members make the CeeCee Community happen. They are the thriving backbone, the dedicated entrepreneurs who work their asses off at the cee spot! And you can meet them. Right here!</span></p>','<p><span style=\"color: rgb(102, 102, 102);\">Our members make the CeeCee Community happen. They are the thriving backbone, the dedicated entrepreneurs who work their asses off at the cee spot! And you can meet them. Right here!</span></p>'),
-	(4,'contact','<p><span style=\"color: rgb(102, 102, 102);\">Do you want to see if working at the cee spot and being a part of the Creative Community ‘CeeCee’ is something for you? Please feel free to book a tour and try-out the cee spot! Just make an appointment with Bart-Jan for a tour or just drop by during office hours at Brouwerijstraat 1 in Enschede. On Fridays, you can make use of our facilities and services for free!</span></p>','<p><span style=\"color: rgb(102, 102, 102);\">Do you want to see if working at the cee spot and being a part of the Creative Community ‘CeeCee’ is something for you? Please feel free to book a tour and try-out the cee spot! Just make an appointment with Bart-Jan for a tour or just drop by during office hours at Brouwerijstraat 1 in Enschede. On Fridays, you can make use of our facilities and services for free!</span></p>'),
-	(5,'our_story','<p><span style=\"color: rgb(102, 102, 102);\">The cee spot is the home of young creatives in Enschede. Located in Roombeek and part of CeeCee: the Creative Community. Our building offers flexible workspaces for creative startups, but also full blown office wings for the grown ups. We also love to host groundbreaking events. Our curiosity to create the future is what connects us. And our community keeps on growing. Want to join? We’d love to meet you!</span></p>','<p><span style=\"color: rgb(102, 102, 102);\">The cee spot is the home of young creatives in Enschede. Located in Roombeek and part of CeeCee: the Creative Community. Our building offers flexible workspaces for creative startups, but also full blown office wings for the grown ups. We also love to host groundbreaking events. Our curiosity to create the future is what connects us. And our community keeps on growing. Want to join? We’d love to meet you!</span></p>'),
+	(2,'book_a_tour','<p>Do you want to see if working at the cee spot and being a part of the Creative Community ‘CeeCee’ is something for you? Please feel free to book a tour and try-out the cee spot! Just make an appointment with Bart-Jan for a tour or just drop by during office hours at Brouwerijstraat 1 in Enschede. On Fridays, you can make use of our facilities and services for free!</p>','<p>Do you want to see if working at the cee spot and being a part of the Creative Community ‘CeeCee’ is something for you? Please feel free to book a tour and try-out the cee spot! Just make an appointment with Bart-Jan for a tour or just drop by during office hours at Brouwerijstraat 1 in Enschede. On Fridays, you can make use of our facilities and services for free!</p>'),
+	(3,'community','<p>Our members make the CeeCee Community happen. They are the thriving backbone, the dedicated entrepreneurs who work their asses off at the cee spot! And you can meet them. Right here!</p>','<p>Our members make the CeeCee Community happen. They are the thriving backbone, the dedicated entrepreneurs who work their asses off at the cee spot! And you can meet them. Right here!</p>'),
+	(4,'contact','<p>Do you want to see if working at the cee spot and being a part of the Creative Community ‘CeeCee’ is something for you? Please feel free to book a tour and try-out the cee spot! Just make an appointment with Bart-Jan for a tour or just drop by during office hours at Brouwerijstraat 1 in Enschede. On Fridays, you can make use of our facilities and services for free!</p>','<p>Do you want to see if working at the cee spot and being a part of the Creative Community ‘CeeCee’ is something for you? Please feel free to book a tour and try-out the cee spot! Just make an appointment with Bart-Jan for a tour or just drop by during office hours at Brouwerijstraat 1 in Enschede. On Fridays, you can make use of our facilities and services for free!</p>'),
+	(5,'our_story','<p>The cee spot is the home of young creatives in Enschede. Located in Roombeek and part of CeeCee: the Creative Community. Our building offers flexible workspaces for creative startups, but also full blown office wings for the grown ups. We also love to host groundbreaking events. Our curiosity to create the future is what connects us. And our community keeps on growing. Want to join? We’d love to meet you!</p>','<p>The cee spot is the home of young creatives in Enschede. Located in Roombeek and part of CeeCee: the Creative Community. Our building offers flexible workspaces for creative startups, but also full blown office wings for the grown ups. We also love to host groundbreaking events. Our curiosity to create the future is what connects us. And our community keeps on growing. Want to join? We’d love to meet you!</p>'),
 	(6,'partners','Bekijk onze partners hierooo','Meet our partners'),
 	(7,'privacy','Hier onze privacy policy','Here\'s our privacy policy'),
-	(8,'spaces','<p><span style=\"color: rgb(102, 102, 102);\">As the heart of CeeCee, the cee spot offers you various spaces for rent.&nbsp;Event space, Meeting space, Office rooms Which creative space are you looking for? Our setups for all spaces are flexible and casual.&nbsp;</span></p><p><span style=\"color: rgb(102, 102, 102);\">The cee spot crews are more than happy to support what you organise.&nbsp;&nbsp;</span></p><p><span style=\"color: rgb(102, 102, 102);\">For any consultation or inquiry requests,&nbsp; please don’t hesitate to contact our community manager.</span></p>','<p><span style=\"color: rgb(102, 102, 102);\">As the heart of CeeCee, the cee spot offers you various spaces for rent.&nbsp;Event space, Meeting space, Office rooms Which creative space are you looking for? Our setups for all spaces are flexible and casual.&nbsp;</span></p><p><span style=\"color: rgb(102, 102, 102);\">The cee spot crews are more than happy to support what you organise.&nbsp;&nbsp;</span></p><p><span style=\"color: rgb(102, 102, 102);\">For any consultation or inquiry requests,&nbsp; please don’t hesitate to contact our community manager.</span></p>');
+	(8,'spaces','<p>As the heart of CeeCee, the cee spot offers you various spaces for rent.&nbsp;Event space, Meeting space, Office rooms Which creative space are you looking for? Our setups for all spaces are flexible and casual.&nbsp;</p><p>The cee spot crews are more than happy to support what you organise.&nbsp;&nbsp;</p><p>For any consultation or inquiry requests,&nbsp; please don’t hesitate to contact our community manager.</p>','<p>As the heart of CeeCee, the cee spot offers you various spaces for rent.&nbsp;Event space, Meeting space, Office rooms Which creative space are you looking for? Our setups for all spaces are flexible and casual.&nbsp;</p><p>The cee spot crews are more than happy to support what you organise.&nbsp;&nbsp;</p><p>For any consultation or inquiry requests,&nbsp; please don’t hesitate to contact our community manager.</p>');
 
 /*!40000 ALTER TABLE `text` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -553,7 +541,7 @@ CREATE TABLE `user_companies` (
   `role` varchar(50) DEFAULT NULL,
   `id` int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `user_companies` WRITE;
 /*!40000 ALTER TABLE `user_companies` DISABLE KEYS */;
@@ -566,7 +554,8 @@ VALUES
 	(23,0,'Plopperdeplop',35),
 	(5,0,'Programmer',38),
 	(24,2,'Developer',39),
-	(28,0,'community manager',40);
+	(28,0,'community manager',40),
+	(24,0,'Junior dev',41);
 
 /*!40000 ALTER TABLE `user_companies` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -582,8 +571,19 @@ CREATE TABLE `user_events` (
   `event_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=214 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+LOCK TABLES `user_events` WRITE;
+/*!40000 ALTER TABLE `user_events` DISABLE KEYS */;
+
+INSERT INTO `user_events` (`id`, `event_id`, `user_id`)
+VALUES
+	(215,46,24),
+	(216,48,24),
+	(217,49,24);
+
+/*!40000 ALTER TABLE `user_events` ENABLE KEYS */;
+UNLOCK TABLES;
 
 
 # Dump of table user_tags
@@ -596,7 +596,7 @@ CREATE TABLE `user_tags` (
   `tag_id` int(11) NOT NULL,
   `id` int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `user_tags` WRITE;
 /*!40000 ALTER TABLE `user_tags` DISABLE KEYS */;
@@ -693,7 +693,7 @@ CREATE TABLE `users` (
   `recoverystring` text,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
@@ -716,7 +716,7 @@ VALUES
 	(21,'thaman6631@gmail.com','verified','$2a$10$j6foUyOGxVaKwbnE7SZfc.htwmnoDzsRMh7JcB/d6gg0wWXfcMK/m',NULL,'Verified','','Verified',NULL,NULL,NULL,NULL,NULL,0,NULL,NULL,NULL,NULL,1,1,'05xy6gcfdlynisfg3np1yg'),
 	(22,'thaman6632@gmail.com','partner','$2a$10$C.9Fv/6UjEF4aQj7k0okOu0EzeLNzRMGjADdE4A95sHtKvhqCCRRy',NULL,'Partner','','Partner',NULL,NULL,NULL,NULL,NULL,0,NULL,NULL,NULL,NULL,1,1,NULL),
 	(23,'thaman6633@gmail.com','fellow','$2a$10$BWkLAFCZKvfkwjeygoj4gew7eaAxWiS.8lwzJMIEVjIMqxAbzQILu',NULL,'Fellow','','Fellow','No description\n','Plopsastreet 75','ABCD 22','IDK','Bulgaria',0,NULL,'2019-01-23 12:02:16',NULL,0,0,0,NULL),
-	(24,'password1@pass.com','Admin','$2a$10$/Y9wN9Zcnua4Fzc0TFYFCOG35yHxbTcmyRgV887yO6VIXCX7p9Lwm','Dhr','Albert',NULL,'Einstein','Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas porta rutrum justo, nec molestie orci elementum non.','Quicksilverstreet 15','1238 AB','Goor','The Netherlands',0,NULL,'2019-01-23 01:00:00',NULL,1,1,1,NULL),
+	(24,'password1@pass.com','Admin','$2a$10$/Y9wN9Zcnua4Fzc0TFYFCOG35yHxbTcmyRgV887yO6VIXCX7p9Lwm','Dhr','Albert',NULL,'Einstein','','Quicksilverstreet 15','1238 AB','Goor','The Netherlands',0,NULL,'2019-01-23 01:00:00',NULL,1,1,1,NULL),
 	(28,'bartjan1@ceecee.community','brtld','$2a$10$BhQPx0B0SGo7M.cDa/pkPO./C1dvWiV94HtnfGr9qR6V.PLJjiaTm',NULL,'Bart-Jan','','Herweijer',NULL,NULL,NULL,NULL,NULL,0,NULL,NULL,NULL,NULL,1,1,NULL),
 	(29,'kylianleemkuil@hotmail.com','kylian','$2a$10$EAfPQKq4FOmaLNg5CUtEZuhDTk1gOgU2cA.qjkOiUERWP/3O9i602',NULL,'Kylian1','','Leemkuil1','Test','Kretastraat 5','7559Cn','Hengelo','Nederland',0,650904145,NULL,'',0,1,1,'sab1cj1jlng3gjip8bnlyq'),
 	(30,'bartjan2@ceecee.community','bart-jan herweijer','$2a$10$tTvzKs.RRvIcVwoE6kuwxuNYDLo1sUQy2mQ1GpjDFe3LHh1ikl78y',NULL,'Bart-Jan','','Herweijer',NULL,NULL,NULL,NULL,NULL,0,NULL,NULL,NULL,NULL,1,1,NULL),
