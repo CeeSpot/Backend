@@ -94,7 +94,12 @@ module.exports = {
                                 // Insert the new user
                                 config.con.query('INSERT INTO users SET ?', post, function (err, res) {
                                     if (err) {
-                                        reject({success: false, data: "Failed to insert user"});
+                                        console.log(err.code);
+                                        if(err.code){
+                                            reject({success: false, data: "A user with this e-mailadres already exists"});
+                                        } else {
+                                            reject({success: false, data: "Failed to insert user"});
+                                        }
                                     } else {
                                         let user_id = res.insertId;
                                         let user_user_role_insert = {
@@ -319,7 +324,7 @@ module.exports = {
             config.con.query("SELECT email FROM users WHERE email = ?", [req.body.email] , function (err, res) {
                 if(res.length == 1){
                     let randomstring = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-                    let recoverylink = "http://localhost:8080/forgot-password-edit/user/"+ randomstring;
+                    let recoverylink = req.headers.origin + "/forgot-password-edit/user/" + randomstring;
                     let message = "Uw recovery link is : " + recoverylink;
                     mailer.sendMail(res[0].email, "Recovery password CeeSpot", message);
                     con.query("UPDATE users SET recoverystring = ? WHERE email = ?", [randomstring, req.body.email], function (err, res) {

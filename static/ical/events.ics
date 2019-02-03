@@ -1,0 +1,53 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+CALSCALE:GREGORIAN
+PRODID:adamgibbons/ics
+METHOD:PUBLISH
+X-PUBLISHED-TTL:PT1H
+BEGIN:VEVENT
+UID:443cbb0d-1af9-4fd8-b292-fe890ef9ac01
+SUMMARY:Fris trendseminar ‘Digital & Retail Revolution in China’
+DTSTAMP:20190129T140900Z
+DTSTART:20190205T170000Z
+DTEND:20190205T200000Z
+DESCRIPTION:Stichting Fris\, Trimm\, Nextport China en Chinatalk nodigen je
+	 uit voor het trendseminar 'Digital & Retail Revolution in China’ op 5 feb
+	ruari aanstaande.
+END:VEVENT
+BEGIN:VEVENT
+UID:aea56489-58a4-4952-bdbc-2d96cc2a6ee3
+SUMMARY:Enschede School of AI
+DTSTAMP:20190129T140900Z
+DTSTART:20190207T053000Z
+DTEND:20190207T073000Z
+DESCRIPTION:5th monthly meetup. See schedule for details.
+END:VEVENT
+BEGIN:VEVENT
+UID:7cabf47a-e18f-495e-aeec-642aec177a90
+SUMMARY:LightBulb Chats: Designer Babies
+DTSTAMP:20190129T140900Z
+DTSTART:20190212T163000Z
+DTEND:20190212T183000Z
+DESCRIPTION:In the second edition of DesignLab’s LightBulb Chats we explore
+	 gene editing in humans: the possibilities\, the dangers\, the grey areas.
+END:VEVENT
+BEGIN:VEVENT
+UID:173a1f65-c421-4c79-9c6d-368ae5631dde
+SUMMARY:Beter presenteren kun je leren
+DTSTAMP:20190129T140900Z
+DTSTART:20190226T181500Z
+DTEND:20190226T203000Z
+DESCRIPTION:Wil jij je collega’s overtuigen van je ideeën? Je verkooppresen
+	tatie leuker en sprankelender maken? Spreektips krijgen die jouw presentat
+	ies verbeteren?
+END:VEVENT
+BEGIN:VEVENT
+UID:e3af73bb-697d-4bb1-91a3-61f0dd08bb19
+SUMMARY:Multiculinair foodfestival Happie
+DTSTAMP:20190129T140900Z
+DTSTART:20190629T090000Z
+DTEND:20190630T190000Z
+DESCRIPTION:Enschede heeft een nieuw festival\, met keukens vanuit de hele 
+	wereld\, live muziek en ander vermaak.
+END:VEVENT
+END:VCALENDAR
